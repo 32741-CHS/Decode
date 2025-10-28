@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +13,11 @@ public class FirstAutoProgram extends LinearOpMode {
     public DcMotor rightForward = null;
     public DcMotor leftBack = null;
     public DcMotor rightBack = null;
+    public DcMotor launchMotor = null;
+    public DcMotor middleMotor = null;
+    public DcMotor topMotor = null;
+    public DcMotor bottomMotor = null;
+
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -21,11 +25,11 @@ public class FirstAutoProgram extends LinearOpMode {
     static final double FORWARD_SPEED = 1.0;
     static final double TURN_SPEED = 0.5;
 
-    static final double COUNTS_PER_MOTOR_REV = 252;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 1.0;     // No External Gearing.
-    static final double WHEEL_DIAMETER_INCHES = 3.75;     // For figuring circumference
+    static final double COUNTS_PER_MOTOR_REV = 537.7;
+    static final double DRIVE_GEAR_REDUCTION = 1.0;
+    static final double WHEEL_DIAMETER_INCHES = 4.1;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+            (WHEEL_DIAMETER_INCHES * Math.PI);
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -36,11 +40,23 @@ public class FirstAutoProgram extends LinearOpMode {
         leftBack = hardwareMap.get(DcMotor.class, "left_Back");
         rightBack = hardwareMap.get(DcMotor.class, "right_Back");
 
+        launchMotor = hardwareMap.get(DcMotor.class, "launch");
+
+        middleMotor = hardwareMap.get(DcMotor.class, "collect");
+        topMotor = hardwareMap.get(DcMotor.class, "collect2");
+        bottomMotor = hardwareMap.get(DcMotor.class, "collect3");
+
+        launchMotor.setDirection(DcMotor.Direction.FORWARD);
+
         leftForward.setDirection(DcMotor.Direction.REVERSE);
         rightForward.setDirection(DcMotor.Direction.FORWARD);
 
         leftBack.setDirection(DcMotor.Direction.REVERSE);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
+
+        middleMotor.setDirection(DcMotor.Direction.REVERSE);
+        topMotor.setDirection(DcMotor.Direction.REVERSE);
+        bottomMotor.setDirection(DcMotor.Direction.REVERSE);
 
         leftForward.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightForward.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -48,11 +64,29 @@ public class FirstAutoProgram extends LinearOpMode {
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        launchMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        middleMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        topMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         leftForward.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightForward.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        middleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        topMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bottomMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        leftForward.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightForward.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
@@ -82,10 +116,20 @@ public class FirstAutoProgram extends LinearOpMode {
      */
 
 
-     encoderDrive(.5,48,48,4);
-
-
+        encoderDrive(.5,21.5,21.5,10);
+        encoderDrive(.5,-25,25,10);
+        launch3();
+        encoderDrive(.5,5,5,10);
+        encoderDrive(.5,-12.15,12.15,10);    //Turn to go collect
+        encoderDrive(.5,-63,-63,10);     //Drive to balls for collection
+        encoderDrive(.5,-25.6,25.6,10);
+        bottomMotor.setPower(1.5);
+        encoderDrive(.5,32,32,20);
     }
+
+
+
+
 
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
@@ -110,6 +154,8 @@ public class FirstAutoProgram extends LinearOpMode {
 
             leftBack.setTargetPosition(LeftBackTarget);
             rightBack.setTargetPosition(RightBackTarget);
+
+
 
             // Turn On RUN_TO_POSITION
             leftForward.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -165,5 +211,59 @@ public class FirstAutoProgram extends LinearOpMode {
 
             sleep(250);   // optional pause after each move.
         }
+
+
+
+    }
+
+    public void launch1() {
+        int targetPos = (launchMotor.getCurrentPosition() + (int) (1425.1));
+        launchMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launchMotor.setPower(1);
+
+
+        while (opModeIsActive() && launchMotor.getCurrentPosition() < (targetPos)) {
+            telemetry.addData("Launch pos", launchMotor.getCurrentPosition());
+            telemetry.update();
+
+        }
+        ;
+
+        launchMotor.setPower(0);
+        telemetry.addLine("Done Launching");
+        telemetry.update();
+
+    }
+    public void launch3(){
+        launch1();
+        loading();
+        launch1();
+        loading();
+        topMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topMotor.setPower(1);
+        sleep(1000);
+        launch1();
+        telemetry.addLine("doneShooting");
+        telemetry.update();
+        topMotor.setPower(0);
+    }
+    public void loading(){
+        topMotor.setTargetPosition(topMotor.getCurrentPosition() + (int) (1500));
+        topMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        topMotor.setPower(1);
+        middleMotor.setTargetPosition(topMotor.getCurrentPosition() + (int) (1500));
+        middleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        middleMotor.setPower(1);
+        telemetry.addLine("topMotor on");
+        telemetry.update();
+        sleep(200);
+        while (opModeIsActive()&& topMotor.isBusy()){
+            telemetry.addData("topPosition",topMotor.getCurrentPosition());
+            telemetry.addData("middlePosition",middleMotor.getCurrentPosition());
+            telemetry.update();
+
+
+
+        };
     }
 }
