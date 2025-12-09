@@ -24,6 +24,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
   private static final String AUTO_BLUE_BACK = "AUTO BLUE BACK";
   private static final String AUTO_RED_BACK = "AUTO RED BACK";
   private static final String AUTO_RED_GOAL = "AUTO RED GOAL";
+  private static final String AUTO_FORWARD = "AUTO FORWARD";
   private String operationSelected = TELEOP;
   private double WHEELS_INCHES_TO_TICKS = (28 * 5 * 3) / (3 * Math.PI);
   private ElapsedTime autoLaunchTimer = new ElapsedTime();
@@ -37,13 +38,13 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
     shotControl = hardwareMap.get(Servo.class, "shotControl");
 
-  // Establishing the direction and mode for the motors
+    // Establishing the direction and mode for the motors
     flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     flywheel.setDirection(DcMotor.Direction.REVERSE);
     coreHex.setDirection(DcMotor.Direction.REVERSE);
     leftDrive.setDirection(DcMotor.Direction.REVERSE);
 
-  //On initilization the Driver Station will prompt for which OpMode should be run - Auto Blue, Auto Red, or TeleOp
+    //On initilization the Driver Station will prompt for which OpMode should be run - Auto Blue, Auto Red, or TeleOp
     while (opModeInInit()) {
       operationSelected = selectOperation(operationSelected, gamepad1.psWasPressed());
       telemetry.update();
@@ -57,6 +58,8 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       doAutoRedGoal();
     } else if (operationSelected.equals(AUTO_RED_BACK)) {
       doAutoRedBack();
+    } else if (operationSelected.equals(AUTO_FORWARD)) {
+      doAutoForward();
     } else {
       doTeleOp();
       servoPosition = 0;
@@ -77,15 +80,17 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
         state = AUTO_RED_GOAL;
       } else if (state.equals(AUTO_RED_GOAL)) {
         state = AUTO_RED_BACK;
-      } else if (state.equals(AUTO_RED_BACK)) {
+      } else if (state.equals(AUTO_FORWARD)) {
         state = TELEOP;
+      } else if (state.equals(AUTO_RED_BACK)) {
+        state = AUTO_FORWARD;
       } else {
         telemetry.addData("WARNING", "Unknown Operation State Reached - Restart Program");
       }
     }
     telemetry.addLine("Press Home Button to cycle options");
     telemetry.addData("CURRENT SELECTION", state);
-    if (state.equals(AUTO_BLUE_GOAL) || state.equals(AUTO_RED_GOAL) || state.equals(AUTO_BLUE_BACK) || state.equals(AUTO_RED_BACK)) {
+    if (state.equals(AUTO_BLUE_GOAL) || state.equals(AUTO_RED_GOAL) || state.equals(AUTO_BLUE_BACK) || state.equals(AUTO_RED_BACK) || state.equals(AUTO_FORWARD)) {
       telemetry.addLine("Please remember to enable the AUTO timer!");
     }
     telemetry.addLine("Press START to start your program");
@@ -112,7 +117,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     }
   }
 
-    /**
+  /**
    * Controls for the drivetrain. The robot uses a split stick stlye arcade drive.
    * Forward and back is on the left stick. Turning is on the right stick.
    */
@@ -126,7 +131,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     rightDrive.setPower(Y + X);
   }
 
-    /**
+  /**
    * Manual control for the Core Hex powered feeder
    */
   private void manualCoreHexControl() {
@@ -143,7 +148,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     }
   }
 
-    /**
+  /**
    * This if/else statement contains the controls for the flywheel, both manual and auto.
    * Circle and Square will spin up ONLY the flywheel to the target velocity set.
    * The bumpers will activate the flywheel, and Core Hex feeder
@@ -205,8 +210,8 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     autoDriveTimer.reset();
 
     // Because leftDrive is REVERSED, we must flip the sign of its target distance.
-    int leftTarget = leftDrive.getCurrentPosition() + (int)(-leftDistanceInch * WHEELS_INCHES_TO_TICKS);
-    int rightTarget = rightDrive.getCurrentPosition() + (int)(rightDistanceInch * WHEELS_INCHES_TO_TICKS);
+    int leftTarget = leftDrive.getCurrentPosition() + (int) (-leftDistanceInch * WHEELS_INCHES_TO_TICKS);
+    int rightTarget = rightDrive.getCurrentPosition() + (int) (rightDistanceInch * WHEELS_INCHES_TO_TICKS);
 
     leftDrive.setTargetPosition(leftTarget);
     rightDrive.setTargetPosition(rightTarget);
@@ -276,6 +281,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       rightDrive.setPower(0);
     }
   }
+
   private void doAutoBlueBack() {
     if (opModeIsActive()) {
       telemetry.addData("RUNNING OPMODE", operationSelected);
@@ -286,8 +292,8 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       leftDrive.setPower(0);
       rightDrive.setPower(0);
       sleep(100);
-      leftDrive.setPower(-0.5);
-      rightDrive.setPower(0.5);
+      leftDrive.setPower(0.5);
+      rightDrive.setPower(-0.5);
       sleep(500);
       leftDrive.setPower(0);
       rightDrive.setPower(0);
@@ -337,6 +343,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       rightDrive.setPower(0);
     }
   }
+
   private void doAutoRedBack() {
     if (opModeIsActive()) {
       telemetry.addData("RUNNING OPMODE", operationSelected);
@@ -347,8 +354,8 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       leftDrive.setPower(0);
       rightDrive.setPower(0);
       sleep(100);
-      leftDrive.setPower(0.5);
-      rightDrive.setPower(-0.5);
+      leftDrive.setPower(-0.5);
+      rightDrive.setPower(0.5);
       sleep(500);
       leftDrive.setPower(0);
       rightDrive.setPower(0);
@@ -364,6 +371,19 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
         telemetry.update();
       }
       ((DcMotorEx) flywheel).setVelocity(0);
+    }
+  }
+
+  private void doAutoForward() {
+    if (opModeIsActive()) {
+      telemetry.addData("RUNNING OPMODE", operationSelected);
+      telemetry.update();
+      leftDrive.setPower(1);
+      rightDrive.setPower(1);
+      sleep(500);
+      leftDrive.setPower(0);
+      rightDrive.setPower(0);
+      sleep(0);
     }
   }
 }
