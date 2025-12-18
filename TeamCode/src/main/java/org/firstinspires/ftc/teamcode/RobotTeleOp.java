@@ -38,9 +38,11 @@ public class RobotTeleOp extends OpMode {
         }
 
         //For Intake (test if same buttons works)
-        if (gamepad2.a) {
+        if (gamepad1.right_trigger !=0 ) {
             intake.startIntake();
-        } else if (gamepad2.x) {
+        } else if (gamepad1.left_trigger !=0) {
+            intake.reverseIntake();
+        } else {
             intake.stopIntake();
         }
 
