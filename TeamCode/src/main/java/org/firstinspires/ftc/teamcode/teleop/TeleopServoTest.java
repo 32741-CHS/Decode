@@ -11,7 +11,7 @@ public class TeleopServoTest extends LinearOpMode {
 
     // GoBilda 2000-series Angular Servo range
     private static final double SERVO_MAX_DEGREES = 1800.0;
-    private static final double SERVO_OFFSET = 238;
+    private static final double SERVO_OFFSET = 22; // 238
 
     // Micro-step size (in degrees)
     private static final double MICRO_STEP = 1.0;

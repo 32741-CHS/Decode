@@ -16,7 +16,7 @@ public class MechController {
 
 
     // Hardware constants
-    private static final double SERVO_OFFSET = 238;
+    private static final double SERVO_OFFSET = 22;
     public static final double[] INTAKE = {0 + SERVO_OFFSET, 138 + SERVO_OFFSET, 271 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Intake Post degrees
     public static final double[] SHOOT = {194 + SERVO_OFFSET, 334 + SERVO_OFFSET, 466 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Shooting Post degrees 180, 270, 60
     private static final double MAX_LIFTER_ROTATION = 300.0; // Degrees
@@ -32,10 +32,10 @@ public class MechController {
     public static final double FULL_DRIVE_POWER = 0.75; // Normal Drive speed
     public static final double INTAKE_DRIVE_POWER = 0.25; // Drive speed during Intake
     static final double SHOOTER_CPR = 28.0; // REV HD Hex encoder counts/rev
-    static final double MOTOR_PULLEY_T = 62.0; // Tooth count on motor
-    static final double WHEEL_PULLEY_T = 58.0; // Tooth count on flywheel
-    public static final double SHOOTING_WHEEL_SPEED_NEAR = 4800; // Shooting wheel RPM. If motor is at 6000 RPM, flywheel ≈ 6000 * 62/58 = 6414 RPM. If flywheel target is 6000 RPM, motor target ≈ 6000 * 58/62 = 5613 RPM
-    public static final double SHOOTING_WHEEL_SPEED_FAR = 6000; // Shooting wheel RPM. If motor is at 6000 RPM, flywheel ≈ 6000 * 62/58 = 6414 RPM. If flywheel target is 6000 RPM, motor target ≈ 6000 * 58/62 = 5613 RPM
+    static final double MOTOR_PULLEY_T = 66.0; // Tooth count on motor
+    static final double WHEEL_PULLEY_T = 54.0; // Tooth count on flywheel
+    public static final double SHOOTING_WHEEL_SPEED_NEAR = 4800; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
+    public static final double SHOOTING_WHEEL_SPEED_FAR = 6860; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
     private static final double INDEXER_DEG_PER_SEC_INTAKE = 180.0;
     private static final double INDEXER_SLOW_END_DEG = 30.0;
 
@@ -468,6 +468,7 @@ public class MechController {
                 intakeIndexerTargetDeg = -1;
                 indexerLastUpdateMs = 0;
                 lastIntake = false;
+                intakeIndexerStartDeg = -1;
                 break;
 
             case SHOOT_STATE:
@@ -555,6 +556,12 @@ public class MechController {
         }
         double traveled = Math.abs(currentDeg - intakeIndexerStartDeg);
         double error = targetDegrees - currentDeg;
+
+        if (Math.abs(error) <= 2.0) {
+            setIndexer(targetDegrees);
+            intakeIndexerStartDeg = -1;
+            return true;
+        }
 
         if (traveled < INDEXER_SLOW_END_DEG) {
             long now = System.currentTimeMillis();
