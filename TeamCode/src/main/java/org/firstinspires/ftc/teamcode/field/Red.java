@@ -5,22 +5,27 @@ import com.pedropathing.geometry.Pose;
 public class Red {
     // Auto
     // Start Pose of our robot.
-    public static final Pose START_POSE = new Pose(80.6, 9, Math.toRadians(90));
+    public static final Pose START_POSE = new Pose(80, 9, Math.toRadians(90));
+    public static final Pose APRILTAG_POSE = new Pose(81,10, Math.toRadians(90));
 
     // Scoring Pose of our robot. It is facing the goal at a 45 degree angle.
-    public static final Pose SCORE_POSE = new Pose(86, 90, Math.toRadians(45));
+    public static final Pose SCORE_POSE_AUTO = new Pose(85, 15.8, Math.toRadians(70));
+    public static final Pose SCORE_POSE_NEAR = new Pose(84.7, 80.5, Math.toRadians(88));
 
     // Highest (First Set) of Artifacts from the Spike Mark.
-    public static final Pose ALIGN1_POSE = new Pose(102.5, 84, Math.toRadians(180));
-    public static final Pose PICKUP1_POSE = new Pose(117.5, 84, Math.toRadians(180));
+    public static final Pose READY1_POSE = new Pose(98.5,36, Math.toRadians(0));
+    public static final Pose ALIGN1_POSE = new Pose(101.5, 36, Math.toRadians(0));
+    public static final Pose PICKUP1_POSE = new Pose(119.5, 36, Math.toRadians(0));
 
     // Middle (Second Set) of Artifacts from the Spike Mark.
-    public static final Pose ALIGN2_POSE = new Pose(102.5, 60, Math.toRadians(180));
-    public static final Pose PICKUP2_POSE = new Pose(117.5, 60, Math.toRadians(180));
+    public static final Pose READY2_POSE = new Pose(98.5,60, Math.toRadians(0));
+    public static final Pose ALIGN2_POSE = new Pose(101.5, 60, Math.toRadians(0));
+    public static final Pose PICKUP2_POSE = new Pose(119.5, 60, Math.toRadians(0));
 
     // Lowest (Last Set) of Artifacts from the Spike Mark.
-    public static final Pose ALIGN3_POSE = new Pose(102.5, 36, Math.toRadians(180));
-    public static final Pose PICKUP3_POSE = new Pose(117.5, 36, Math.toRadians(180));
+    public static final Pose READY3_POSE = new Pose(94,84, Math.toRadians(0));
+    public static final Pose ALIGN3_POSE = new Pose(101.5, 84, Math.toRadians(0));
+    public static final Pose PICKUP3_POSE = new Pose(119.5, 84, Math.toRadians(0));
 
     // Teleop
     // Gate Start & End

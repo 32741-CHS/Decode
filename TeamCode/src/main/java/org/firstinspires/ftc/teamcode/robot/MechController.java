@@ -31,13 +31,13 @@ public class MechController {
     private static final long DROP_WAIT_MS = 500; // Post Lifter in Down position
     private static final long APRIL_TAG_WAIT_MS = 3000; // 3 seconds waiting to detect AprilTag
     public static final double FULL_DRIVE_POWER = 1.0; // Normal Drive speed
-    public static final double INTAKE_DRIVE_POWER = 0.25; // Drive speed during Intake
+    public static final double INTAKE_DRIVE_POWER = 0.23; // Drive speed during Intake
     public static final double INTAKE_DRIVE_TELEOP = 0.5; // Drive speed during Intake
     static final double SHOOTER_CPR = 28.0; // REV HD Hex encoder counts/rev
     static final double MOTOR_PULLEY_T = 66.0; // Tooth count on motor
     static final double WHEEL_PULLEY_T = 54.0; // Tooth count on flywheel
     public static double SHOOTING_WHEEL_SPEED_NEAR = 4300; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
-    public static double SHOOTING_WHEEL_SPEED_FAR = 6600; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
+    public static double SHOOTING_WHEEL_SPEED_FAR = 5300; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM | 6200
     private static final double INDEXER_DEG_PER_SEC_INTAKE = 200.0;
     private static final double INDEXER_SLOW_END_DEG = 40.0;
 

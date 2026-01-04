@@ -23,7 +23,7 @@ public class AutoRed_Pedro extends OpMode {
     private int pathState;
 
     private final Pose startPose = Red.START_POSE;
-    private final Pose scorePose = Red.SCORE_POSE;
+    private final Pose scorePose = Red.SCORE_POSE_AUTO;
     private final Pose align1Pose = Red.ALIGN1_POSE;
     private final Pose pickup1Pose = Red.PICKUP1_POSE;
     private final Pose align2Pose = Red.ALIGN2_POSE;

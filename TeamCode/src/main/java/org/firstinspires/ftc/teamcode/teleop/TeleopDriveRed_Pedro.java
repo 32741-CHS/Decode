@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 @Disabled
 public class TeleopDriveRed_Pedro extends OpMode {
     private Follower follower;
-    private final Pose startingPose = Red.SCORE_POSE;
-    private final Pose scorePose = Red.SCORE_POSE;
+    private final Pose startingPose = Red.START_POSE;
+    private final Pose scorePose = Red.SCORE_POSE_NEAR;
     private final Pose endgamePose = Red.ENDGAME_POSE;
     private final Pose gateStartPose = Red.GATE_START_POSE;
     private final Pose gateEndPose = Red.GATE_END_POSE;
