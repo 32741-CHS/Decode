@@ -38,7 +38,7 @@ public class MechController {
     static final double WHEEL_PULLEY_T = 54.0; // Tooth count on flywheel
     public static double SHOOTING_WHEEL_SPEED_NEAR = 4300; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
     public static double SHOOTING_WHEEL_SPEED_FAR = 5300; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM | 6200
-    private static final double INDEXER_DEG_PER_SEC_INTAKE = 200.0;
+    private static final double INDEXER_DEG_PER_SEC_INTAKE = 180.0;
     private static final double INDEXER_SLOW_END_DEG = 40.0;
 
     // Limit constants
@@ -73,6 +73,7 @@ public class MechController {
     private boolean lastIntake = false;
     private double intakeIndexerStartDeg = -1;
     private boolean artifactCounted = false;
+    private double farRPM = 0;
 
     // Constructor
     public MechController(RobotHardware RoboRoar, VisionController visionController) {
@@ -282,7 +283,7 @@ public class MechController {
                 break;
 */
 
-            case INTAKE_STATE:
+            /*case INTAKE_STATE:
                 currentState = MechState.INTAKE_STATE;
 
                 switch (intakeStage) {
@@ -297,6 +298,73 @@ public class MechController {
                             }
                             if (robot.intakeMot.getPower() == 1) {
                                 runIntakeMot(0);
+                            }
+                            setState(MechState.IDLE);
+                            break;
+                        } else {
+                            setIndexer(INTAKE[intakeTargetIndex]);
+                            intakeStageStart = System.currentTimeMillis();
+                            if (robot.intakeMot.getPower() == 0) {
+                                runIntakeMot(1);
+                            }
+                            intakeStage = 1;
+                            break;
+                        }
+                    case 1:
+                        if (System.currentTimeMillis() - intakeStageStart >= POST_ROTATE_WAIT_MS) { // Wait time before detecting artifact
+                            intakeStage = 2;
+                        }
+                        break;
+
+                    case 2:
+                        int color = visionController.artifactColor();
+                        boolean detected = color != 0;
+
+                        if (detected && !artifactCounted) { // Artifact detection
+                            artifactCounted = true;
+                            indexer[intakeTargetIndex] = color;
+                            artifactCount++;
+                            if (artifactCount == 3) { //Checks for last intake
+                                lastIntake = true;
+                            }
+                            intakeStage = 0;
+                            break;
+                        }
+                        if (!detected && artifactCounted) {
+                            artifactCounted = false;
+                        }
+
+                        if (System.currentTimeMillis() - intakeStageStart >= INTAKE_CUTOFF_MS) { // Timer cut-off
+                            runIntakeMot(0);
+                            setState(MechState.IDLE);
+                            intakeStage = 0;
+                            break;
+                        }
+                }
+                break; */
+
+            case INTAKE_STATE:
+                currentState = MechState.INTAKE_STATE;
+
+                switch (intakeStage) {
+
+                    case 0:
+                        intakeTargetIndex = getEmptyIndex();
+                        if (intakeTargetIndex == -1) { // Stop intake stage
+                            if (lastIntake) {
+                                if (intakeIndexerTargetDeg < 0) {
+                                    intakeIndexerTargetDeg = (statusIndexer() + 60);
+                                    indexerLastUpdateMs = 0;
+                                }
+                                if (setIndexerIntake(intakeIndexerTargetDeg)) {
+                                    intakeStage = 0;
+                                    intakeIndexerTargetDeg = -1;
+                                    lastIntake = false;
+                                    artifactCounted = false;
+                                }
+                                if (robot.intakeMot.getPower() == 1) {
+                                    runIntakeMot(0);
+                                }
                             }
                             setState(MechState.IDLE);
                             break;
@@ -686,6 +754,27 @@ public class MechController {
             robot.shootingMot.setPower(0);
         }
     }
+
+    private double getShootingFarRPM() {
+        double voltage = visionController.getBatteryVoltage();
+        if (voltage > 13.5) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR;
+        } else if (voltage > 13.25) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 100;
+        } else if (voltage > 13.0) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 200;
+        } else if (voltage > 12.75) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 300;
+        } else if (voltage > 12.5) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 400;
+        } else if (voltage > 12.25) {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 500;
+        } else {
+            farRPM = SHOOTING_WHEEL_SPEED_FAR + 600;
+        }
+        return farRPM;
+    }
+
     public void setLifter(int down0up1) {
         if (lastLifter != down0up1) {
             if (down0up1 == 1) {

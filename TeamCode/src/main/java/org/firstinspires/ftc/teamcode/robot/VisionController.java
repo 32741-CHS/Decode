@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import android.graphics.Color;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -166,6 +169,18 @@ public class VisionController {
     }
     private boolean isPurple(float hue, float sat, float val) {
         return (hue >= 200 && hue <= 300) && sat > 0.3 && val > 0.2;
+    }
+
+    public double getBatteryVoltage() {
+        double result = 0.0;
+        for (VoltageSensor sensor : hardwareMap.getAll(VoltageSensor.class)) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) { // Ignore invalid readings
+                result = voltage;
+                break;
+            }
+        }
+        return result;
     }
 
     public void sensorTelemetry() {
