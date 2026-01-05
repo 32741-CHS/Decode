@@ -745,8 +745,8 @@ public class MechController {
 
     double getFlywheelRPM() {
         return robot.shootingMot.getVelocity()
-                * 60.0 / SHOOTER_CPR
-                * MOTOR_PULLEY_T / WHEEL_PULLEY_T;
+                * (60.0 / SHOOTER_CPR)
+                * (MOTOR_PULLEY_T / WHEEL_PULLEY_T);
     }
 
     public void runShootingMot(double power) {
