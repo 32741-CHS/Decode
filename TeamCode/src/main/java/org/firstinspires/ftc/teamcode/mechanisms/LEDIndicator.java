@@ -4,24 +4,39 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class LEDIndicator {
-    private Servo turretServo;
+    private Servo LEDindicator;
 
     private final double LEDStartValue = 0.0; // nominally 0 degrees, may need to be tuned based on mounting angle of servo
     private double currentLEDValue;
 
     public void init (HardwareMap hwMap) {
-        turretServo = hwMap.get(Servo.class,"LEDIndicator");
+        LEDindicator = hwMap.get(Servo.class,"blinkin");
         currentLEDValue = LEDStartValue;
     }
 
     public void incrementLEDValue() {
         currentLEDValue = currentLEDValue + .05;
-        turretServo.setPosition(currentLEDValue);
+        LEDindicator.setPosition(currentLEDValue);
     }
 
     public void decrementLEDValue() {
         currentLEDValue = currentLEDValue - .05;
-        turretServo.setPosition(currentLEDValue);
+        LEDindicator.setPosition(currentLEDValue);
+    }
+
+    public void setLEDRed(){
+        currentLEDValue = .30;
+        LEDindicator.setPosition(currentLEDValue);
+    }
+
+    public void setLEDBlue(){
+        currentLEDValue = .60;
+        LEDindicator.setPosition(currentLEDValue);
+    }
+
+    public void setLEDGreen(){
+        currentLEDValue = .50;
+        LEDindicator.setPosition(currentLEDValue);
     }
 
     public double getLEDValue(){

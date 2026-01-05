@@ -7,6 +7,7 @@ import com.sun.tools.doclint.Entity;
 
 import org.firstinspires.ftc.teamcode.mechanisms.AprilTagsWebcam;
 import org.firstinspires.ftc.teamcode.mechanisms.Intake;
+import org.firstinspires.ftc.teamcode.mechanisms.LEDIndicator;
 import org.firstinspires.ftc.teamcode.mechanisms.Launcher;
 import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.TurretServo;
@@ -18,6 +19,7 @@ public class WebcamTestOpMode  extends OpMode {
     MecanumDrive drive = new MecanumDrive();
     Intake intake = new Intake();
     TurretServo turret = new TurretServo();
+    LEDIndicator led = new LEDIndicator();
     int numMissingTagReads = 0;
 
 
@@ -28,6 +30,7 @@ public class WebcamTestOpMode  extends OpMode {
         drive.init(hardwareMap);
         intake.init(hardwareMap);
         turret.init(hardwareMap);
+        led.init(hardwareMap);
        // turret.init(hardwareMap);
     }
 
@@ -45,16 +48,19 @@ public class WebcamTestOpMode  extends OpMode {
 
             double distanceToGoalCM = id585.ftcPose.range;
             launcher.setMotorVelocityForDistance(distanceToGoalCM);
+            led.setLEDGreen();
             // NOTE: use this after distance vs speed has been measured and calibrated
             //launcher.setMotorVelocityForDistance(distanceToGoalCM);
         } else if (numMissingTagReads < 100){
             numMissingTagReads++;
+            led.setLEDBlue();
         } else {
             // if we can't see the target/            // default back to neutral/default
             //turret.resetTurret();
             // and turn launch motors off
             launcher.stopLauncher();
             turret.resetTurret();
+            led.setLEDRed();
         }
 
         // these are manual test methods to assist with tuning the target launch motor velocity at measured distances
@@ -73,7 +79,7 @@ public class WebcamTestOpMode  extends OpMode {
             launcher.loadBall();
 
         } else {
-            // already triggered, wait for it to reset
+            launcher.resetFeeder();
         }
 
         if (gamepad2.leftStickButtonWasPressed()) {
@@ -119,8 +125,8 @@ public class WebcamTestOpMode  extends OpMode {
         // telemetry.addLine("Feeder active: " + launcher.getTriggerActive());
         telemetry.addLine("Missed Tag Reads: " + numMissingTagReads);
         telemetry.addLine("Target Velocity: " + launcher.getTargetLaunchSpeed());
-        telemetry.addLine("Lower Velocity: " + launcher.getLowerVelocity());
-        telemetry.addLine("Upper Velocity: " + launcher.getUpperVelocity());
+        telemetry.addLine("Right Velocity: " + launcher.getLowerVelocity());
+        telemetry.addLine("Left Velocity: " + launcher.getUpperVelocity());
         telemetry.addData("State: ", launcher.getState());
         String turretPositionStr = String.format("%.2f",turret.getCurrentPosition());
         telemetry.addLine("Turret Position: " + turretPositionStr);
