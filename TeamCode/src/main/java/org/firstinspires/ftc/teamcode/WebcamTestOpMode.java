@@ -38,10 +38,10 @@ public class WebcamTestOpMode  extends OpMode {
     public void loop() {
         //Update the vision portal
         aprilTagWebcam.update();
-        AprilTagDetection id585 = aprilTagWebcam.getTagBySpecificId(585); // TAG ID 24 is the red goal
+        AprilTagDetection id585 = aprilTagWebcam.getTagBySpecificId(0); // TAG ID 24 is the red goal
         aprilTagWebcam.displayDetectionTelemetry(id585);
         // NOTE: we will need a separate OPMODE (otherwise identical) that sets the target TAGID to BLUE (#20)
-        if (id585 != null) {
+        if (id585 != null && id585.ftcPose != null) {
             numMissingTagReads = 0;
             double angleToTag = id585.ftcPose.bearing;
             turret.changeTurretByDegrees(angleToTag);

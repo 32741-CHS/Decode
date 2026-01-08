@@ -69,14 +69,19 @@ public class AprilTagsWebcam {
         }
     }
     public AprilTagDetection getTagBySpecificId(int id) {
-       /* for (AprilTagDetection detection : detectedTags){
+        for (AprilTagDetection detection : detectedTags){
             if (detection.id == id){
                 return detection;
             }
-        }*/
-        if (detectedTags.size() > 0) {
-            return detectedTags.get(0);
         }
+
+        if (id == 0){
+            if (detectedTags.size() > 0) {
+                return detectedTags.get(0);
+            }
+        }
+
+
         return null;
     }
 
