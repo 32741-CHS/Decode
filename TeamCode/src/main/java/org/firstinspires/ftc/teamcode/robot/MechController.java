@@ -31,7 +31,7 @@ public class MechController {
     private static final long DROP_WAIT_MS = 500; // Post Lifter in Down position
     private static final long APRIL_TAG_WAIT_MS = 3000; // 3 seconds waiting to detect AprilTag
     public static final double FULL_DRIVE_POWER = 1.0; // Normal Drive speed
-    public static final double INTAKE_DRIVE_POWER = 0.23; // Drive speed during Intake
+    public static final double INTAKE_DRIVE_POWER = 0.21; // Drive speed during Intake
     public static final double INTAKE_DRIVE_TELEOP = 0.5; // Drive speed during Intake
     static final double SHOOTER_CPR = 28.0; // REV HD Hex encoder counts/rev
     static final double MOTOR_PULLEY_T = 66.0; // Tooth count on motor
@@ -192,9 +192,9 @@ public class MechController {
                         break;
                 }
                 break;
-/*
-            case INTAKE_STATE:
-                currentState = MechState.INTAKE_STATE;
+
+            case INTAKE_STATE_TELEOP:
+                currentState = MechState.INTAKE_STATE_TELEOP;
 
                 switch (intakeStage) {
 
@@ -281,67 +281,6 @@ public class MechController {
                         break;
                 }
                 break;
-*/
-
-            /*case INTAKE_STATE:
-                currentState = MechState.INTAKE_STATE;
-
-                switch (intakeStage) {
-
-                    case 0:
-                        intakeTargetIndex = getEmptyIndex();
-                        if (intakeTargetIndex == -1) { // Stop intake stage
-                            if (lastIntake) {
-                                setIndexer(statusIndexer() + 60);
-                                lastIntake = false;
-                                artifactCounted = false;
-                            }
-                            if (robot.intakeMot.getPower() == 1) {
-                                runIntakeMot(0);
-                            }
-                            setState(MechState.IDLE);
-                            break;
-                        } else {
-                            setIndexer(INTAKE[intakeTargetIndex]);
-                            intakeStageStart = System.currentTimeMillis();
-                            if (robot.intakeMot.getPower() == 0) {
-                                runIntakeMot(1);
-                            }
-                            intakeStage = 1;
-                            break;
-                        }
-                    case 1:
-                        if (System.currentTimeMillis() - intakeStageStart >= POST_ROTATE_WAIT_MS) { // Wait time before detecting artifact
-                            intakeStage = 2;
-                        }
-                        break;
-
-                    case 2:
-                        int color = visionController.artifactColor();
-                        boolean detected = color != 0;
-
-                        if (detected && !artifactCounted) { // Artifact detection
-                            artifactCounted = true;
-                            indexer[intakeTargetIndex] = color;
-                            artifactCount++;
-                            if (artifactCount == 3) { //Checks for last intake
-                                lastIntake = true;
-                            }
-                            intakeStage = 0;
-                            break;
-                        }
-                        if (!detected && artifactCounted) {
-                            artifactCounted = false;
-                        }
-
-                        if (System.currentTimeMillis() - intakeStageStart >= INTAKE_CUTOFF_MS) { // Timer cut-off
-                            runIntakeMot(0);
-                            setState(MechState.IDLE);
-                            intakeStage = 0;
-                            break;
-                        }
-                }
-                break; */
 
             case INTAKE_STATE:
                 currentState = MechState.INTAKE_STATE;
@@ -353,30 +292,29 @@ public class MechController {
                         if (intakeTargetIndex == -1) { // Stop intake stage
                             if (lastIntake) {
                                 if (intakeIndexerTargetDeg < 0) {
-                                    intakeIndexerTargetDeg = (statusIndexer() + 60);
-                                    indexerLastUpdateMs = 0;
+                                    intakeIndexerTargetDeg = (statusIndexer() + 62);
+                                    indexerLastUpdateMs = System.currentTimeMillis();
                                 }
                                 if (setIndexerIntake(intakeIndexerTargetDeg)) {
-                                    intakeStage = 0;
+                                    runIntakeMot(0);
                                     intakeIndexerTargetDeg = -1;
                                     lastIntake = false;
                                     artifactCounted = false;
+                                    intakeStage = 0;
                                 }
-                                if (robot.intakeMot.getPower() == 1) {
-                                    runIntakeMot(0);
-                                }
+                                break;
                             }
+                            runIntakeMot(0);
                             setState(MechState.IDLE);
                             break;
-                        } else {
-                            setIndexer(INTAKE[intakeTargetIndex]);
-                            intakeStageStart = System.currentTimeMillis();
-                            if (robot.intakeMot.getPower() == 0) {
-                                runIntakeMot(1);
-                            }
-                            intakeStage = 1;
-                            break;
                         }
+                        setIndexer(INTAKE[intakeTargetIndex]);
+                        intakeStageStart = System.currentTimeMillis();
+                        if (robot.intakeMot.getPower() == 0) {
+                            runIntakeMot(1);
+                        }
+                        intakeStage = 1;
+                        break;
                     case 1:
                         if (System.currentTimeMillis() - intakeStageStart >= POST_ROTATE_WAIT_MS) { // Wait time before detecting artifact
                             intakeStage = 2;
@@ -591,6 +529,7 @@ public class MechController {
     private void onStateExit(MechState from, MechState to) {
         switch (from) {
             case INTAKE_STATE:
+            case INTAKE_STATE_TELEOP:
                 // Stop intake motor and reset intake state machine
                 robot.intakeMot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 robot.intakeMot.setPower(0);

@@ -84,7 +84,7 @@ public class TeleopDriveBlue extends OpMode {
         MechState state = mechController.getCurrentState();
         if (state == MechState.SHOOT_STATE || state == MechState.SHOOT_PURPLE || state == MechState.SHOOT_GREEN) {
             follower.setMaxPower(0.0);
-        } else if (state == MechState.INTAKE_STATE) {
+        } else if (state == MechState.INTAKE_STATE_TELEOP) {
             follower.setMaxPower(MechController.INTAKE_DRIVE_TELEOP);
         } else {
             follower.setMaxPower(MechController.FULL_DRIVE_POWER);
@@ -92,7 +92,7 @@ public class TeleopDriveBlue extends OpMode {
 
         if ((gamepad1.right_trigger > 0.2) && !buttonPressed) {
             buttonPressed = true;
-            mechController.setState(MechState.INTAKE_STATE);
+            mechController.setState(MechState.INTAKE_STATE_TELEOP);
         } else if ((gamepad2.right_trigger > 0.2) && !buttonPressed) {
             buttonPressed = true;
             mechController.setState(MechState.SHOOT_STATE);

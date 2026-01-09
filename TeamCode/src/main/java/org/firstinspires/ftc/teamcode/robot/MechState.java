@@ -5,6 +5,7 @@ public enum MechState {
     IDLE,
     SHOOT_STATE,
     INTAKE_STATE,
+    INTAKE_STATE_TELEOP,
     SHOOT_PURPLE,
     SHOOT_GREEN,
     APRIL_TAG,
