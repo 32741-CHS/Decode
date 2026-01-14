@@ -23,6 +23,7 @@ public class AutoLeft extends OpMode {
     int numMissingTagReads = 0;
 
     enum State {
+        FIND_TAG,
         DELAY_START,
         DELAY,
         SPIN_UP,
@@ -30,7 +31,7 @@ public class AutoLeft extends OpMode {
         MOVE_FORWARD,
         FINISHED
     }
-    State state = State.DELAY_START;
+    State state = State.FIND_TAG;
     ElapsedTime driveTimer = new ElapsedTime();
 
     @Override
@@ -42,25 +43,18 @@ public class AutoLeft extends OpMode {
         turret.init(hardwareMap);
         led.init(hardwareMap);
 
-        state = State.DELAY_START;
+        state = State.FIND_TAG;
     }
 
     @Override
     public void loop() {
         telemetry.addData("Current state", state);
         doAprilTag();
-        telemetry.addData("Current state", state);
+        AprilTagDetection id24 = aprilTagWebcam.getTagBySpecificId(24);
 
         switch (state) {
-            case DELAY_START:
-                driveTimer.reset();
-                intake.stopIntake();
-                launcher.resetFeeder();
-                state = State.DELAY;
-                        break;
-            case DELAY:
-                driveTimer.reset();
-                if (driveTimer.seconds() < 2){
+            case FIND_TAG:
+                if(id24 != null){
                     state = State.SPIN_UP;
                 }
                 break;
@@ -84,7 +78,7 @@ public class AutoLeft extends OpMode {
             case MOVE_FORWARD:
                 driveTimer.reset();
                 while (driveTimer.seconds() < 1) {
-                    drive.drive(0.1, 0.0, 0.0);
+                    drive.drive(0.3, 0.0, 0.0);
                 }
                 drive.drive(0,0,0);
                 state = State.FINISHED;
