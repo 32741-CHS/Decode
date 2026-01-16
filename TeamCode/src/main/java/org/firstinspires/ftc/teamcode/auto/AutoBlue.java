@@ -33,15 +33,15 @@ public class AutoBlue extends OpMode {
     private final Pose aprilTagPose = Blue.APRILTAG_POSE;
     private final Pose scorePoseAuto = Blue.SCORE_POSE_AUTO;
     private final Pose scorePoseNear = Blue.SCORE_POSE_NEAR;
-    private final Pose ready1Pose = Blue.READY3_POSE;
-    private final Pose align1Pose = Blue.ALIGN3_POSE;
-    private final Pose pickup1Pose = Blue.PICKUP3_POSE;
+    private final Pose ready1Pose = Blue.READY1_POSE;
+    private final Pose align1Pose = Blue.ALIGN1_POSE;
+    private final Pose pickup1Pose = Blue.PICKUP1_POSE;
     private final Pose ready2Pose = Blue.READY2_POSE;
     private final Pose align2Pose = Blue.ALIGN2_POSE;
     private final Pose pickup2Pose = Blue.PICKUP2_POSE;
-    private final Pose ready3Pose = Blue.READY1_POSE;
-    private final Pose align3Pose = Blue.ALIGN1_POSE;
-    private final Pose pickup3Pose = Blue.PICKUP1_POSE;
+    private final Pose ready3Pose = Blue.READY3_POSE;
+    private final Pose align3Pose = Blue.ALIGN3_POSE;
+    private final Pose pickup3Pose = Blue.PICKUP3_POSE;
 
 
     private Path aprilTagRead;

@@ -16,9 +16,9 @@ public class MechController {
 
 
     // Hardware constants
-    private static final double SERVO_OFFSET = 0;
-    public static final double[] INTAKE = {0 + SERVO_OFFSET, 135 + SERVO_OFFSET, 271 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Intake Post degrees 0, 120, 240
-    public static final double[] SHOOT = {195 + SERVO_OFFSET, 334 + SERVO_OFFSET, 467 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Shooting Post degrees 180, 300, 420
+    private static final double SERVO_OFFSET = 104;
+    public static final double[] INTAKE = {0 + SERVO_OFFSET, 138 + SERVO_OFFSET, 271 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Intake Post degrees 0, 120, 240
+    public static final double[] SHOOT = {209 + SERVO_OFFSET, 334 + SERVO_OFFSET, 475 + SERVO_OFFSET}; // Indexer 0, 1, 2 @ Shooting Post degrees 180, 300, 420
     private static final double MAX_LIFTER_ROTATION = 300.0; // Degrees
     private static final double MAX_INDEXER_ROTATION = 1800.0; // Degrees
     private static final double INTAKE_TICKS_PER_FULL_ROTATION = 537.7; //Encoder Resolution PPR for RPM 312

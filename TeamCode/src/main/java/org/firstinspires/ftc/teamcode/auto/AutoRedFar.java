@@ -8,19 +8,15 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import org.firstinspires.ftc.teamcode.field.Blue;
-import org.firstinspires.ftc.teamcode.field.Blue_FarNear;
+import org.firstinspires.ftc.teamcode.field.Red_FarNear;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.MechController;
 import org.firstinspires.ftc.teamcode.robot.MechState;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.robot.VisionController;
 import org.firstinspires.ftc.vision.VisionPortal;
-
-
-@Autonomous(name = "AutoBlueFar", group = "Auto")
-public class AutoBlueFar extends OpMode {
+@Autonomous(name = "AutoRedFar", group = "Auto")
+public class AutoRedFar extends OpMode {
 
 
         RobotHardware robot;
@@ -32,23 +28,24 @@ public class AutoBlueFar extends OpMode {
         private Timer pathTimer, actionTimer, opmodeTimer;
         private int pathState;
 
-        private final Pose startPose = Blue_FarNear.START_POSE;
-        private final Pose aprilTagPose = Blue_FarNear.APRILTAG_POSE;
-        private final Pose scorePoseAuto = Blue_FarNear.SCORE_POSE_AUTO;
-        private final Pose scorePoseNear = Blue_FarNear.SCORE_POSE_NEAR;
-        private final Pose ready1Pose = Blue_FarNear.READY1_POSE;
-        private final Pose align1Pose = Blue_FarNear.ALIGN1_POSE;
-        private final Pose pickup1Pose = Blue_FarNear.PICKUP1_POSE;
-        private final Pose ready2Pose = Blue_FarNear.READY2_POSE;
-        private final Pose align2Pose = Blue_FarNear.ALIGN2_POSE;
-        private final Pose pickup2Pose = Blue_FarNear.PICKUP2_POSE;
-        private final Pose ready3Pose = Blue_FarNear.READY3_POSE;
-        private final Pose align3Pose = Blue_FarNear.ALIGN3_POSE;
-        private final Pose pickup3Pose = Blue_FarNear.PICKUP3_POSE;
-
+        private final Pose startPose = Red_FarNear.START_POSE;
+        private final Pose aprilTagPose = Red_FarNear.APRILTAG_POSE;
+        private final Pose scorePoseAuto = Red_FarNear.SCORE_POSE_AUTO;
+        private final Pose scorePoseNear = Red_FarNear.SCORE_POSE_NEAR;
+        private final Pose ready1Pose = Red_FarNear.READY1_POSE;
+        private final Pose align1Pose = Red_FarNear.ALIGN1_POSE;
+        private final Pose pickup1Pose = Red_FarNear.PICKUP1_POSE;
+        private final Pose ready2Pose = Red_FarNear.READY2_POSE;
+        private final Pose align2Pose = Red_FarNear.ALIGN2_POSE;
+        private final Pose pickup2Pose = Red_FarNear.PICKUP2_POSE;
+        private final Pose ready3Pose = Red_FarNear.READY3_POSE;
+        private final Pose align3Pose = Red_FarNear.ALIGN3_POSE;
+        private final Pose pickup3Pose = Red_FarNear.PICKUP3_POSE;
 
         private Path aprilTagRead;
-        private PathChain scorePreload, readyPickup1, alignPickup1, grabPickup1, scorePickup1, readyPickup2, alignPickup2, grabPickup2, scorePickup2, readyPickup3, alignPickup3, grabPickup3, scorePickup3;
+        private PathChain scorePreload, readyPickup1, alignPickup1, grabPickup1, scorePickup1, readyPickup2,
+                alignPickup2, grabPickup2, scorePickup2, readyPickup3,
+                alignPickup3, grabPickup3, scorePickup3;
 
         public void buildPaths() {
             aprilTagRead = new Path(new BezierLine(startPose, aprilTagPose));
@@ -95,13 +92,13 @@ public class AutoBlueFar extends OpMode {
                     .build();
 
             scorePickup2 = follower.pathBuilder()
-                    .addPath(new BezierLine(pickup2Pose, scorePoseAuto))
-                    .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePoseAuto.getHeading())
+                    .addPath(new BezierLine(pickup2Pose, scorePoseNear))
+                    .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePoseNear.getHeading())
                     .build();
 
             readyPickup3 = follower.pathBuilder()
-                    .addPath(new BezierLine(scorePoseAuto, ready3Pose))
-                    .setLinearHeadingInterpolation(scorePoseAuto.getHeading(), ready3Pose.getHeading())
+                    .addPath(new BezierLine(scorePoseNear, ready3Pose))
+                    .setLinearHeadingInterpolation(scorePoseNear.getHeading(), ready3Pose.getHeading())
                     .build();
 
             alignPickup3 = follower.pathBuilder()
@@ -119,6 +116,7 @@ public class AutoBlueFar extends OpMode {
                     .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePoseNear.getHeading())
                     .build();
         }
+
         public void autonomousPathUpdate() {
             switch (pathState) {
                 case 0:
@@ -230,6 +228,7 @@ public class AutoBlueFar extends OpMode {
             pathTimer.resetTimer();
         }
 
+        /** Called once at INIT button press */
         @Override
         public void loop() {
             mechController.update();
@@ -237,7 +236,7 @@ public class AutoBlueFar extends OpMode {
             autonomousPathUpdate();
 
             MechState state = mechController.getCurrentState();
-            if (state == MechState.SHOOT_STATE || state == MechState.APRIL_TAG) {
+            if (state == MechState.SHOOT_STATE) {
                 follower.setMaxPower(0.0);
             } else if (state == MechState.INTAKE_STATE) {
                 follower.setMaxPower(MechController.INTAKE_DRIVE_POWER);

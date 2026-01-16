@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 @TeleOp(name = "TeleopBlue", group = "Teleop")
 public class TeleopDriveBlue extends OpMode {
     private Follower follower;
-    private final Pose startingPose = Blue.SCORE_POSE_NEAR;
+    private final Pose startingPose = Blue.READY2_POSE;
     private final Pose scorePoseNear = Blue.SCORE_POSE_NEAR;
     private final Pose scorePoseFar = Blue.SCORE_POSE_FAR;
     private final Pose endgamePose = Blue.ENDGAME_POSE;

@@ -5,7 +5,7 @@ import com.pedropathing.geometry.Pose;
 public class Red_NearFar {
     // Auto
     // Start Pose of our robot.
-    public static final Pose START_POSE = new Pose(121, 125, Math.toRadians(37));
+    public static final Pose START_POSE = new Pose(105.5, 134.5, Math.toRadians(90));
     public static final Pose APRILTAG_POSE = new Pose(84.7,80.5, Math.toRadians(90));
 
     // Scoring Pose of our robot. It is facing the goal at a 45 degree angle.
@@ -29,11 +29,14 @@ public class Red_NearFar {
 
     // Teleop
     // Gate Start & End
-    public static final Pose GATE_START_POSE = new Pose(126, 72, Math.toRadians(180));
-    public static final Pose GATE_END_POSE = new Pose(129, 72, Math.toRadians(180));
+    public static final Pose GATE_START_POSE = new Pose(121, 70.5, Math.toRadians(0));
+    public static final Pose GATE_END_POSE = new Pose(127, 70.5, Math.toRadians(0));
+
+    // Human State Pose
+    public static final Pose HUMAN_STATE_POSE = new Pose(16, 15, Math.toRadians(0));
 
     // Endgame
-    public static final Pose ENDGAME_POSE = new Pose(38, 33, Math.toRadians(90));
+    public static final Pose ENDGAME_POSE = new Pose(38.5, 33, Math.toRadians(90));
 
     private Red_NearFar() {} // Prevent instantiation
 }

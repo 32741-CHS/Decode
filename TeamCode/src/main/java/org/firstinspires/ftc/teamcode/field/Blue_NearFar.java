@@ -6,8 +6,8 @@ public class Blue_NearFar {
 
         // Auto
         // Start Pose of our robot.
-        public static final Pose START_POSE   = new Pose(23, 125, Math.toRadians(143));
-        public static final Pose APRILTAG_POSE = new Pose(59.3,80.5, Math.toRadians(90));
+        public static final Pose START_POSE   = new Pose(38.5, 134.5, Math.toRadians(90)); // og = 23, 125,(143)
+        public static final Pose APRILTAG_POSE = new Pose(59.3,80.5, Math.toRadians(80));
 
         // Scoring Pose of our robot. It is facing the goal at a 135 degree angle.
         public static final Pose SCORE_POSE_AUTO = new Pose(59, 15.8, Math.toRadians(115));

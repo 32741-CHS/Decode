@@ -14,9 +14,9 @@ public class Blue_FarNear {
         public static final Pose SCORE_POSE_NEAR = new Pose(59.3, 80.5, Math.toRadians(133));
 
         // Highest (First Set) of Artifacts from the Spike Mark.
-        public static final Pose READY1_POSE = new Pose(50, 84,Math.toRadians(0));
-        public static final Pose ALIGN1_POSE  = new Pose(42.5, 84, Math.toRadians(0));//new Pose(50, 84, Math.toRadians(0)); // og = 41.5, 84
-        public static final Pose PICKUP1_POSE = new Pose(24.5, 84, Math.toRadians(0)); //new Pose(17, 84, Math.toRadians(0)); //og = 24, 84
+        public static final Pose READY1_POSE = new Pose(45.5, 36,Math.toRadians(0));
+        public static final Pose ALIGN1_POSE  = new Pose(42.5, 36, Math.toRadians(0));//new Pose(50, 84, Math.toRadians(0)); // og = 41.5, 84
+        public static final Pose PICKUP1_POSE = new Pose(24.5, 36, Math.toRadians(0)); //new Pose(17, 84, Math.toRadians(0)); //og = 24, 84
 
         // Middle (Second Set) of Artifacts from the Spike Mark.
         public static final Pose READY2_POSE = new Pose(45.5, 60,Math.toRadians(0));
@@ -24,9 +24,9 @@ public class Blue_FarNear {
         public static final Pose PICKUP2_POSE = new Pose(24.5, 60, Math.toRadians(0));//new Pose(17, 60, Math.toRadians(0)); // og = 24, 60
 
         // Lowest (Last Set) of Artifacts from the Spike Mark.
-        public static final Pose READY3_POSE = new Pose(45.5, 36,Math.toRadians(0));
-        public static final Pose ALIGN3_POSE  = new Pose(42.5, 36, Math.toRadians(0));//new Pose(50, 36, Math.toRadians(0)); // og = 41.5, 36
-        public static final Pose PICKUP3_POSE = new Pose(24.5, 36, Math.toRadians(0));//new Pose(17, 36, Math.toRadians(0)); // og: 24, 36
+        public static final Pose READY3_POSE = new Pose(50, 84,Math.toRadians(0));
+        public static final Pose ALIGN3_POSE  = new Pose(42.5, 84, Math.toRadians(0));//new Pose(50, 36, Math.toRadians(0)); // og = 41.5, 36
+        public static final Pose PICKUP3_POSE = new Pose(24.5, 84, Math.toRadians(0));//new Pose(17, 36, Math.toRadians(0)); // og: 24, 36
         // Teleop
         // Gate Start & End
         public static final Pose GATE_START_POSE = new Pose(23, 70.5, Math.toRadians(180));//new Pose(23, 72, Math.toRadians(180));
