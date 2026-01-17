@@ -132,15 +132,15 @@ public class TeleopDriveRed extends OpMode {
 
         if (!automatedDrive) {
             if (!slowMode) follower.setTeleOpDrive(
-                    gamepad1.left_stick_y,
-                    gamepad1.left_stick_x,
+                    -gamepad1.left_stick_y,
+                    -gamepad1.left_stick_x,
                     -gamepad1.right_stick_x,
                     false // true = Robot Centric | false = Field Centric
             );
 
             else follower.setTeleOpDrive(
-                    gamepad1.left_stick_y * slowModeMultiplier,
-                    gamepad1.left_stick_x * slowModeMultiplier,
+                    -gamepad1.left_stick_y * slowModeMultiplier,
+                    -gamepad1.left_stick_x * slowModeMultiplier,
                     -gamepad1.right_stick_x * slowModeMultiplier,
                     false // true = Robot Centric | false = Field Centric
             );
