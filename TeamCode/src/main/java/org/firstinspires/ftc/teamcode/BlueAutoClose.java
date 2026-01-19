@@ -25,7 +25,7 @@ public class BlueAutoClose extends OpMode {
     LEDIndicator led = new LEDIndicator();
     int numMissingTagReads = 0;
 
-    enum State {
+    private enum State {
         START_TIMER_FIRST_TIME,
         FIND_TAG,
         BACK_UP,
@@ -43,15 +43,24 @@ public class BlueAutoClose extends OpMode {
         LAUNCHING_2,
         ROTATE_LEFT_2,
         MOVE_FORWARD_9,
-        MOVE_LEFT_2,
+        MOVE_LEFT_3,
         MOVE_FORWARD_2,
         HOLD_FORWARD_2,
         MOVE_BACKWARD_2,
-        MOVE_RIGHT_2,
-        ROTATE_RIGHT_2,
-        FIND_TAG_3,
+        MOVE_RIGHT_4,
+        ROTATE_RIGHT_3,
         LAUNCHING_3,
-        MOVE_LEFT_3,
+        MOVE_LEFT_4,
+//        MOVE_LEFT_2,
+//        MOVE_FORWARD_2,
+//        HOLD_FORWARD_2,
+//        MOVE_BACKWARD_2,
+//        MOVE_RIGHT_2,
+//        ROTATE_RIGHT_2,
+//        FIND_TAG_3,
+//        LAUNCHING_3,
+//        MOVE_LEFT_3,
+
         FINISHED,
     }
     State state = State.FIND_TAG;
@@ -179,13 +188,13 @@ public class BlueAutoClose extends OpMode {
                 }
                 else {
                     drive.drive(0,0,0);
-                    state = State.ROTATE_RIGHT;
+                    state = State.MOVE_RIGHT;
                     driveTimer.reset();
                 }
                 break;
             case MOVE_RIGHT:
                 // skipping this state
-                if (driveTimer.seconds() < .7) {
+                if (driveTimer.seconds() < .2) {
                     drive.drive(0.0, 0.5, 0.0);
                 }
                 else {
@@ -195,7 +204,7 @@ public class BlueAutoClose extends OpMode {
                 }
                 break;
             case ROTATE_RIGHT:
-                if (driveTimer.seconds() < 0.46) {
+                if (driveTimer.seconds() < 0.41) {
                     drive.drive(0.0, 0.0, 0.4);
                 }
                 else {
@@ -246,11 +255,11 @@ public class BlueAutoClose extends OpMode {
                 }
                 else {
                     drive.drive(0, 0, 0);
-                    state = State.MOVE_LEFT_2;
+                    state = State.MOVE_LEFT_3;
                 }
                 break;
-            case MOVE_LEFT_2:
-                if (driveTimer.seconds() < 2.12) {
+            case MOVE_LEFT_3:
+                if (driveTimer.seconds() < 2.02) {
                     drive.drive(0.0, -0.4, 0.0);
                 }
                 else {
@@ -286,22 +295,22 @@ public class BlueAutoClose extends OpMode {
                 }
                 else {
                     drive.drive(0,0,0);
-                    state = State.MOVE_RIGHT_2;
+                    state = State.MOVE_RIGHT_4;
                     driveTimer.reset();
                 }
                 break;
-            case MOVE_RIGHT_2:
+            case MOVE_RIGHT_4:
                 // skipping this state
                 if (driveTimer.seconds() < 1.3) {
                     drive.drive(0.0, 0.5, 0.0);
                 }
                 else {
                     drive.drive(0,0,0);
-                    state = State.ROTATE_RIGHT_2;
+                    state = State.ROTATE_RIGHT_3;
                     driveTimer.reset();
                 }
                 break;
-            case ROTATE_RIGHT_2:
+            case ROTATE_RIGHT_3:
                 if (driveTimer.seconds() < 0.42) {
                     drive.drive(0.0, 0.0, 0.4);
                 }
@@ -328,17 +337,16 @@ public class BlueAutoClose extends OpMode {
                     launcher.stopLauncher();
                     launcher.lowerLaunch.setVelocity(0);
                     launcher.upperLaunch.setVelocity(0);
-                    state = State.MOVE_LEFT_3;
+                    state = State.MOVE_LEFT_4;
                     driveTimer.reset();
                 }
                 break;
-
-            case MOVE_LEFT_3:
+            case MOVE_LEFT_4:
                 if (driveTimer.seconds() < 1) {
                     drive.drive(0.0, -0.4, 0.0);
                 }
                 else if (driveTimer.seconds() < 1.4) {
-                    drive.drive(0.0, -0.4, 0.4);
+                    drive.drive(0.0, -0.4, -0.4);
                 }
                 else if (driveTimer.seconds() < 2.4) {
                     drive.drive(0.0, -0.4, 0.0);
@@ -357,6 +365,7 @@ public class BlueAutoClose extends OpMode {
         }
 
     }
+
     private void doAprilTag(){
         //Update the vision portal
         aprilTagWebcam.update();
@@ -386,3 +395,4 @@ public class BlueAutoClose extends OpMode {
         }
     }
 }
+

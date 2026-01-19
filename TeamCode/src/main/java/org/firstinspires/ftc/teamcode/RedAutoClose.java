@@ -80,11 +80,11 @@ public class RedAutoClose extends OpMode {
         telemetry.addData("Current state", state);
         // if (in spin up, launch, find tag, etc
         if(state == State.FIND_TAG ||
-                state == State.FIND_TAG_2 ||
-                state == State.LAUNCHING ||
-                state == State.LAUNCHING_2 ||
-                state == State.SPIN_UP ||
-                state == State.SPIN_UP_2)
+            state == State.FIND_TAG_2 ||
+            state == State.LAUNCHING ||
+            state == State.LAUNCHING_2 ||
+            state == State.SPIN_UP ||
+            state == State.SPIN_UP_2)
         {
             doAprilTag();
         }
@@ -209,8 +209,8 @@ public class RedAutoClose extends OpMode {
                 }
                 break;
             case SPIN_UP_2:
-                speedError = launcher.getLaunchSpeedError();
-                angleError = turret.getAngleError();
+                 speedError = launcher.getLaunchSpeedError();
+                 angleError = turret.getAngleError();
                 if (speedError < 100){
                     state = State.LAUNCHING_2;
                     driveTimer.reset();
@@ -357,6 +357,7 @@ public class RedAutoClose extends OpMode {
         }
 
     }
+
     private void doAprilTag(){
         //Update the vision portal
         aprilTagWebcam.update();
@@ -386,3 +387,4 @@ public class RedAutoClose extends OpMode {
         }
     }
 }
+

@@ -12,7 +12,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Launcher {
+
     public static LaunchState LaunchState;
+
     private final int FEED_TIME_MILLISECONDS = 500; //The feeder servo runs this long when a shot is requested.
     private final double FEED_STOP = 0.0;
     private final double FEED_START = 1.0;
@@ -220,6 +222,8 @@ public class Launcher {
 
        switch (launchState) {
             case IDLE:
+                upperLaunch.setVelocity(0);
+                lowerLaunch.setVelocity(0);
                 break;
             case SPIN_UP:
                 //feederTimer.reset();
