@@ -33,12 +33,12 @@ public class MechController {
 
     public static final double FULL_DRIVE_POWER = 1.0; // Normal Drive speed
 
-    public static final double INTAKE_DRIVE_POWER = 0.19; // Drive speed during Intake
-    public static final double INTAKE_DRIVE_TELEOP = 0.7; // Drive speed during Intake
+    public static final double INTAKE_DRIVE_POWER = 0.19; // Drive speed during Intake Auto
+    public static final double INTAKE_DRIVE_TELEOP = 0.6; // Drive speed during Intake TeleOp
     static final double SHOOTER_CPR = 28.0; // REV HD Hex encoder counts/rev
     static final double MOTOR_PULLEY_T = 66.0; // Tooth count on motor
     static final double WHEEL_PULLEY_T = 54.0; // Tooth count on flywheel
-    public static final double SHOOTING_WHEEL_SPEED_NEAR = 4300; //- Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
+    public static final double SHOOTING_WHEEL_SPEED_NEAR = 4300; // Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM
     public static double SHOOTING_WHEEL_SPEED_FAR = 5600; // 5400 5700 Flywheel RPM | Max flywheel RPM: 7333 | Flywheel RPM ≈ 6000 (Motor RPM) * 66/54 = 7333 RPM | Motor RPM ≈ 6000 (Flywheel RPM) * 54/66 = 4909 RPM | 6200
     private static final double INDEXER_DEG_PER_SEC_INTAKE = 150.0; // 160
     private static final double INDEXER_SLOW_END_DEG = 40.0;
