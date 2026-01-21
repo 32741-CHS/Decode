@@ -34,7 +34,7 @@ public class MechController {
     public static final double FULL_DRIVE_POWER = 1.0; // Normal Drive speed
 
     public static final double INTAKE_DRIVE_POWER = 0.19; // Drive speed during Intake
-    public static final double INTAKE_DRIVE_TELEOP = 0.5; // Drive speed during Intake
+    public static final double INTAKE_DRIVE_TELEOP = 0.7; // Drive speed during Intake
     static final double SHOOTER_CPR = 28.0; // REV HD Hex encoder counts/rev
     static final double MOTOR_PULLEY_T = 66.0; // Tooth count on motor
     static final double WHEEL_PULLEY_T = 54.0; // Tooth count on flywheel
