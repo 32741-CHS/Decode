@@ -1,7 +1,13 @@
 package org.firstinspires.ftc.teamcode.Util;
 
+import static org.firstinspires.ftc.teamcode.Util.Enum.DrumSlots.SLOT_0;
+import static org.firstinspires.ftc.teamcode.Util.Enum.DrumSlots.SLOT_1;
+import static org.firstinspires.ftc.teamcode.Util.Enum.DrumSlots.SLOT_2;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.teamcode.Util.Enum.DrumSlots;
 
 /** (import static org.firstinspires.ftc.teamcode.Util.constants.*;)
  * import it by doing this and then you can just type something like
@@ -26,6 +32,8 @@ public final class constants {
         public static final String FiringPinServo = "FiringPinServo";
         public static final String odomhub = "odomhub";
         public static final String limelight = "limelight";
+
+        public static final DrumSlots[] drumslotarray = {SLOT_0,SLOT_1,SLOT_2};
 
     }
 

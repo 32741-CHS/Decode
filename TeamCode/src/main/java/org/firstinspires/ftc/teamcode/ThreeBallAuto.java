@@ -163,7 +163,7 @@ public class ThreeBallAuto extends LinearOpMode {
         //launch with pattern
 
         Action movetoloadingone = drive.actionBuilder(startPose)
-                .splineTo(new Vector2d(-60, 40 * mirrory),Math.toRadians(85))
+                .splineTo(new Vector2d(-60, 30 * mirrory),Math.toRadians(85))
                 .build();
         Actions.runBlocking(movetoloadingone);
         startPose = drive.localizer.getPose();

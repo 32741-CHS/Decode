@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.limelight.LimelightPosSetting.limel
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -21,6 +22,7 @@ import org.firstinspires.ftc.teamcode.Util.Enum.Balls;
 import org.firstinspires.ftc.teamcode.positioning.odometry.FieldOrientedDriving;
 //uwu
 
+@TeleOp(name = "young child")
 
 public class YoungCHildOp extends LinearOpMode {
 
@@ -147,9 +149,15 @@ public class YoungCHildOp extends LinearOpMode {
 
             //limelight
 
+            double dpadspeedmod = 0;
+            if(gamepad2.dpadDownWasPressed()) dpadspeedmod = -1;
+            if(gamepad2.dpadUpWasPressed()) dpadspeedmod = 1;
+            if(gamepad2.dpadLeftWasPressed()) dpadspeedmod = -0.1;
+            if(gamepad2.dpadRightWasPressed()) dpadspeedmod = 0.1;
 
             //auto rangeing commands
-            motortargetspeedradians = autoLaunch();
+            motortargetspeedradians = motortargetspeedradians + dpadspeedmod;
+            if (motortargetspeedradians > 4.5) motortargetspeedradians = 4.5;
             if (gamepad2.left_trigger >= 0.3) {
                 motortargetspeedradians = -1;
             }

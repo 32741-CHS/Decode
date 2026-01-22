@@ -189,15 +189,6 @@ public class BaseOpMode extends LinearOpMode {
                                  gamepad2.b ? 2:
                                          firingpositionstarget;
 
-
-                /*
-                targetdrumangle = gamepad2.x ? .1 ://Firing angles
-                                gamepad2.y ? .42 :
-                                gamepad2.b ? .76 :
-                                gamepad1.x ? .27 ://loading angles
-                                gamepad1.y ? .6 :
-                                gamepad1.b ? .92 :
-                                    targetdrumangle;*/
             }
 
             Balls loadedcolor = colorDetection(colorSensor1, colorSensor2);
@@ -212,15 +203,11 @@ public class BaseOpMode extends LinearOpMode {
                     telemetry.addLine("ball Detected");
                     targetdrumslot++;
 
-
                 }else if (loadedcolor != unknown && targetdrumslot < 4 && timer.milliseconds() > 600){
                     Scooper.setVelocity(999,AngleUnit.RADIANS);
                 }
             }
             else Scooper.setVelocity(0, AngleUnit.RADIANS);
-
-
-
             //clamps the target to 3
 
             if(gamepad1.right_bumper){
