@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
 
   private DcMotor flywheel;
-  private Servo shotControl;
   private DcMotor coreHex;
   private DcMotor frontLeft;
   private DcMotor backLeft;
@@ -31,16 +30,17 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
   private double WHEELS_INCHES_TO_TICKS = (28 * 5 * 3) / (3 * Math.PI);
   private ElapsedTime autoLaunchTimer = new ElapsedTime();
   private ElapsedTime autoDriveTimer = new ElapsedTime();
+  AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
 
   @Override
   public void runOpMode() {
+    aprilTagWebcam.init(hardwareMap, telemetry);
     flywheel = hardwareMap.get(DcMotor.class, "flywheel");
     coreHex = hardwareMap.get(DcMotor.class, "coreHex");
     frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
     backLeft = hardwareMap.get(DcMotor.class, "backLeft");
     frontRight = hardwareMap.get(DcMotor.class, "frontRight");
     backRight = hardwareMap.get(DcMotor.class, "backRight");
-    shotControl = hardwareMap.get(Servo.class, "shotControl");
 
     // Establishing the direction and mode for the motors
     flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -117,23 +117,42 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
         telemetry.addData("Flywheel Velocity", ((DcMotorEx) flywheel).getVelocity());
         telemetry.addData("Flywheel Power", flywheel.getPower());
         telemetry.update();
-        shotControl.setPosition(servoPosition);
+        aprilTagWebcam.update();
+        aprilTagWebcam.displayDetectionTelemetry(aprilTagWebcam.getTagBySpecificId(20));
+        aprilTagWebcam.displayDetectionTelemetry(aprilTagWebcam.getTagBySpecificId(24));
       }
     }
   }
 
-  /**
-   * Controls for the drivetrain. The robot uses a split stick stlye arcade drive.
-   * Forward and back is on the left stick. Turning is on the right stick.
-   */
+
   private void splitStickArcadeDrive() {
     // y = forward/backward, x = strafe left/right, rx = turn left/right
-    double y = -gamepad1.left_stick_x; // Remember: Y is reversed on the joystick
-    double x = gamepad1.left_stick_y * 1.1; // Counteract motor friction when strafing
+    double y = -gamepad1.left_stick_x;
+    double x = gamepad1.left_stick_y * 1.1;
     double rx = -gamepad1.right_stick_x;
 
-    // Denominator is the largest motor power (absolute value) or 1
-    // This ensures all powers maintain the same ratio, even if one is > 1
+    // Check if the button is currently being HELD
+    if (gamepad1.circle) {
+      int targetID = 20;
+      // Get the specific tag from webcam helper class
+      org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection = aprilTagWebcam.getTagBySpecificId(targetID);
+
+      if (detection != null && detection.ftcPose != null) {
+        double TURN_GAIN = 0.03;
+
+        // Override the manual rx with the bearing (the angle to the tag)
+        rx = detection.ftcPose.bearing * TURN_GAIN;
+
+        telemetry.addData("Auto-Face", "Targeting ID", targetID);
+        telemetry.addData("Bearing", detection.ftcPose.bearing);
+      } else {
+        // If button is held but tag is not in view, stop turning
+        rx = 0;
+        telemetry.addData("Auto-Face", "ID NOT IN VIEW", targetID);
+      }
+    }
+
+    // Denominator ensures all powers maintain the same ratio
     double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1.0);
 
     double frontLeftPower = (y + x + rx) / denominator;
@@ -146,6 +165,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     frontRight.setPower(frontRightPower);
     backRight.setPower(backRightPower);
   }
+
 
 
   /**
