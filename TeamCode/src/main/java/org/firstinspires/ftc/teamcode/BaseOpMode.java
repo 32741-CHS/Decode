@@ -85,6 +85,10 @@ public class BaseOpMode extends LinearOpMode {
         leftBack.setDirection(DcMotor.Direction.REVERSE); //inverting later
         rightFront.setDirection(DcMotor.Direction.FORWARD); //should generally do whenever motors
         rightBack.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         LauncherFL = hardwareMap.get(DcMotorEx.class, "LauncherFL");
         Scooper = hardwareMap.get(DcMotorEx.class, "Scooper");
@@ -120,7 +124,7 @@ public class BaseOpMode extends LinearOpMode {
 
             double leftstickinputy = gamepad1.left_stick_y; // Forward/backward negative because it's naturally inverted
             double leftstickinputx = gamepad1.left_stick_x; // side to side
-            double targetturn = gamepad1.right_stick_x; // Turning
+            double targetturn = gamepad1.right_stick_x / 2; // Turning
 
             //slowermovement for the guner
             double leftstickinputy2 = gamepad2.left_stick_y / 6;
@@ -192,6 +196,7 @@ public class BaseOpMode extends LinearOpMode {
             }
 
             Balls loadedcolor = colorDetection(colorSensor1, colorSensor2);
+
             if (gamepad1.left_bumper){
                 Scooper.setVelocity(999, AngleUnit.RADIANS);
             }

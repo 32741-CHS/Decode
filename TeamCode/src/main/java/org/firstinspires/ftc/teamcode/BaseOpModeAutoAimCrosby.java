@@ -99,6 +99,10 @@ public class BaseOpModeAutoAimCrosby extends LinearOpMode {
         leftBack.setDirection(DcMotor.Direction.REVERSE); //inverting later
         rightFront.setDirection(DcMotor.Direction.FORWARD); //should generally do whenever motors
         rightBack.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         DcMotorEx launcherFL = hardwareMap.get(DcMotorEx.class, "LauncherFL");
         DcMotorEx scooper = hardwareMap.get(DcMotorEx.class, "Scooper");
@@ -219,10 +223,11 @@ public class BaseOpModeAutoAimCrosby extends LinearOpMode {
                 scooper.setVelocity(-999, AngleUnit.RADIANS);
                 if (loadedcolor != unknown && targetdrumslot < 3 && timer.milliseconds() > 600){
                     timer.reset();
-
                     AllSlots.setFromSlot(loadedcolor,targetdrumslot);
                     telemetry.addLine("ball Detected");
                     targetdrumslot++;
+                }else if (loadedcolor != unknown && targetdrumslot < 4 && timer.milliseconds() > 600){
+                    scooper.setVelocity(999,AngleUnit.RADIANS);
                 }
             }
             else scooper.setVelocity(0, AngleUnit.RADIANS);
@@ -300,6 +305,7 @@ public class BaseOpModeAutoAimCrosby extends LinearOpMode {
 
             //while holding down the bumpers moves the intake
             if (gamepad1.left_bumper) scooper.setVelocity(999, AngleUnit.RADIANS);
+            else if (gamepad1.right_bumper) scooper.setVelocity(-999, AngleUnit.RADIANS);
             else scooper.setVelocity(0, AngleUnit.RADIANS);
 
             boolean autoAimPressed = gamepad2.right_bumper && !autoAimLast;

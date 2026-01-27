@@ -18,10 +18,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Util.Enum.Balls;
 
-@Autonomous(name="movetwofeet")
+@Autonomous(name="spin")
 @Config
 
-public class movetwofeet extends LinearOpMode {
+public class Spin extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx Scooper;
     private Servo DrumServo;
@@ -29,8 +29,7 @@ public class movetwofeet extends LinearOpMode {
     private DcMotorEx LauncherFL;
 
     public static double xdistance = 12;
-    public static double ydistance = 0;
-    public static double initialdeadingdegrees = 0;
+    public static double ydistance = 12;
 
     @Override
     public void runOpMode() {
@@ -67,20 +66,19 @@ public class movetwofeet extends LinearOpMode {
 
         // y = x
         // x = -y
-        Pose2d startPose = new Pose2d(0, 0, initialdeadingdegrees);
+        Pose2d startPose = new Pose2d(0, 0, 0);
         MecanumDrive drive = new MecanumDrive(  hardwareMap,  startPose);
 
         waitForStart();////////////////////////////////////////////////////
 
-        while(opModeIsActive()) {
-            Action movetoloadingone = drive.actionBuilder(startPose)
-                    .splineToConstantHeading(new Vector2d(xdistance, ydistance), Math.toRadians(0))
-                    .build();
-            Actions.runBlocking(movetoloadingone);
-            startPose = drive.localizer.getPose();
+        Action movetoloadingone = drive.actionBuilder(startPose)
+                .turnTo(Math.toRadians(90))
+                .build();
+        Actions.runBlocking(movetoloadingone);
 
 
-            break;
-        }
+
+
+
     }
 }

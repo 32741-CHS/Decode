@@ -76,8 +76,8 @@ public final class constants {
         public static final double predictedmotify = 0;
         //Targets are in Meters
         public static final double shoottargetx = -1.6256;
-        public static final double shoottargetyred = 1.7256;
-        public static final double shoottargetyblue = -2.0256;
+        public static final double shoottargetyred = 1.6256;
+        public static final double shoottargetyblue = -1.6256;
 
         public static final double mtoin = 39.370787;
     }

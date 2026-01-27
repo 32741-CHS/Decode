@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.NonOpModes.depreciated;
 
 import static org.firstinspires.ftc.teamcode.Util.RobotPosition.getRobotCoordinates;
 import static org.firstinspires.ftc.teamcode.Util.RobotPosition.modifyRobotCoordinates;

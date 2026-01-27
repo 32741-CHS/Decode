@@ -1,15 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.NonOpModes.depreciated;
 
 import static org.firstinspires.ftc.teamcode.NonOpModes.colorsensing.ColorSensingFunctions.colorDetection;
 import static org.firstinspires.ftc.teamcode.Util.Enum.Balls.green;
 import static org.firstinspires.ftc.teamcode.Util.Enum.Balls.purple;
 import static org.firstinspires.ftc.teamcode.Util.Enum.Balls.unknown;
+import static org.firstinspires.ftc.teamcode.Util.RRSplineToLaunchPos.returnToPreLoadY;
 import static org.firstinspires.ftc.teamcode.Util.RRSplineToLaunchPos.splineLaunchPos;
-import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.FIELD_HALF;
-import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.mtoin;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinfiringposition;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinnullposition;
-import static org.firstinspires.ftc.teamcode.launcher.AutoFirePower.autoLaunch;
 import static org.firstinspires.ftc.teamcode.limelight.LimelightMotifSetting.limelightMotifSet;
 
 import androidx.annotation.NonNull;
@@ -23,36 +21,33 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Util.Enum.Balls;
 
-import java.util.Arrays;
-
-@Autonomous(name="FullRRtestautoTurning")
+@Autonomous(name="FullRRtestauto")
 @Config
 
-public class AutoWithRoadRunnerStrafe extends LinearOpMode {
+public class AutoWithRoadRunner extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx Scooper;
     private Servo DrumServo;
     private Servo FiringPinServo;
     private DcMotorEx LauncherFL;
-    public double firingangle = 142;
+    public static double firingangle = 142;//142 is what it should be based off of logic
 
-    public double preloadingy = 18;
-    public double ballpickupy = 53.5;
-    public double loadingprepxoffset = 6;
-    public double loadonex = -18;
-    public double loadtwox = 12;
-    public double loadthreex = 30;
+    public static double preloadingy = 18;
+    public static double ballpickupy = 53.5;
+    public static double loadingprepxoffset = 6;
+    public static double loadonex = -18;
+    public static double loadtwox = 12;
+    public static double loadthreex = 30;
 
     @Override
     public void runOpMode() {
@@ -101,23 +96,18 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
 
 
 
-        telemetry.addLine("moving to launch zone");
-        telemetry.update();
-
-        splineLaunchPos(drive,startPose,-170,1);
+        splineLaunchPos(drive,startPose,-170,1);//-170
         startPose = drive.localizer.getPose();
 
 
-        telemetry.addLine("moving to launch zone");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
 
         //limelight get pattern
 
         targetballcolors = limelightMotifSet(limelight);
         // TODO add error handling
-        telemetry.addData("motif",targetballcolors);
+        telemetry.addData("motif",targetballcolors[0]);
+        telemetry.addData("motif",targetballcolors[1]);
+        telemetry.addData("motif",targetballcolors[2]);
 
         splineLaunchPos(drive,startPose,firingangle,1);
         startPose = drive.localizer.getPose();
@@ -126,6 +116,7 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         telemetry.addData("x" , startPose.position.x);
         telemetry.addData("y", startPose.position.y);
         telemetry.update();
+
 
 
 
@@ -140,7 +131,12 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
                     sleep(400);
                     FiringPinServo.setPosition(firingpinnullposition);
                     sleep(400);
+
                 }
+                telemetry.addData("in slot color", drumBallColors[j]);
+                telemetry.addData("lookingfor color", targetballcolors[i]);
+                telemetry.update();
+                sleep(500);
             }
 
         }
@@ -150,16 +146,12 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         //launch with pattern
 
         Action movetoloadingone = drive.actionBuilder(startPose)
-                .splineTo(new Vector2d(loadonex + loadingprepxoffset,ballpickupy),Math.toRadians(0))
+                .splineTo(new Vector2d(loadonex + loadingprepxoffset,preloadingy),Math.toRadians(0))
                 .build();
         Actions.runBlocking(movetoloadingone);
         startPose = drive.localizer.getPose();
 
 
-        telemetry.addLine("doing first load");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
 
         //intake
 
@@ -186,6 +178,7 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
                         }
                         targetdrumslotload = Math.min(targetdrumslotload,2);
                         targetdrumangleload = drumlocations[targetdrumslotload];
+                        DrumServo.setPosition(targetdrumangleload);
                         return false;
                     }
                 }
@@ -193,19 +186,15 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         Actions.runBlocking(pickUpLoadOne);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("moving to launch zone");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
+
+        returnToPreLoadY(drive,startPose,preloadingy,1);
+        startPose = drive.localizer.getPose();
 
         splineLaunchPos(drive,startPose,firingangle,1);
         startPose = drive.localizer.getPose();
-        //luanch
+        //launch
 
-        telemetry.addLine("moving to second load ");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
+
 
         Action moveToLoadingTwo = drive.actionBuilder(startPose)
                 .splineTo(new Vector2d(loadtwox-loadingprepxoffset,preloadingy),Math.toRadians(0))
@@ -213,10 +202,7 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         Actions.runBlocking(moveToLoadingTwo);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("second load");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
+
         //intake
 
         Action pickUpLoadTwo = drive.actionBuilder(startPose)
@@ -225,18 +211,13 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         Actions.runBlocking(pickUpLoadTwo);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("moving to launch zone");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
+        returnToPreLoadY(drive,startPose,preloadingy,1);
+        startPose = drive.localizer.getPose();
 
         splineLaunchPos(drive,startPose,firingangle,1);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("moving to load three ");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
+
 
         //launch
 
@@ -246,10 +227,6 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         Actions.runBlocking(moveToLoadingThree);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("doing third load");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.update();
 
         //intake
 
@@ -259,12 +236,11 @@ public class AutoWithRoadRunnerStrafe extends LinearOpMode {
         Actions.runBlocking(pickUpLoadThree);
         startPose = drive.localizer.getPose();
 
-        telemetry.addLine("moving to launch zone");
-        telemetry.addData("x" , startPose.position.x);
-        telemetry.addData("y", startPose.position.y);
-        telemetry.addLine("end");
-        telemetry.update();
+        returnToPreLoadY(drive,startPose,preloadingy,1);
+        startPose = drive.localizer.getPose();
 
         splineLaunchPos(drive,startPose,firingangle,1);
+
+        //fire
     }
 }

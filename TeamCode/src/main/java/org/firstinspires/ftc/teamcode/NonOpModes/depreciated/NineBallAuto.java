@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.NonOpModes.depreciated;
 
 import static org.firstinspires.ftc.teamcode.NonOpModes.colorsensing.ColorSensingFunctions.colorDetection;
 import static org.firstinspires.ftc.teamcode.Util.Enum.Balls.green;
@@ -27,12 +27,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Util.Enum.Balls;
 
 
 @Config
 
-public class SixBallAuto extends LinearOpMode {
+public class NineBallAuto extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime intaketimer = new ElapsedTime();
     private DcMotorEx Scooper;
@@ -46,7 +47,7 @@ public class SixBallAuto extends LinearOpMode {
     public static double ballpickupy = 60;
 
     public static double loadonex = 0;
-    public static double loadtwox = 16;
+    public static double loadtwox = 24;
     public static double loadthreex = 30;
 
     protected boolean isred;
@@ -60,7 +61,7 @@ public class SixBallAuto extends LinearOpMode {
             mirrory = 1;
         } else{
             mirrory = -1;
-            //firingangle = 130;
+            firingangle = 144;
         }
         ballpickupy = mirrory * ballpickupy;
         preloadingy = mirrory * preloadingy;
@@ -170,7 +171,7 @@ public class SixBallAuto extends LinearOpMode {
         Actions.runBlocking(moveToLoadingTwo);
         startPose = drive.localizer.getPose();
 
-        /*loadingMove(drive,startPose,drumlocations, colorSensor1, colorSensor2);
+        loadingMove(drive,startPose,drumlocations, colorSensor1, colorSensor2);
         drumBallColors = new Balls[]{Balls.purple, Balls.green, purple};
         startPose = drive.localizer.getPose();
 
@@ -187,7 +188,7 @@ public class SixBallAuto extends LinearOpMode {
         Action EndSpot = drive.actionBuilder(startPose)
                 .splineToConstantHeading(new Vector2d(loadtwox,preloadingy * mirrory),Math.toRadians(85))
                 .build();
-        Actions.runBlocking(EndSpot);*/
+        Actions.runBlocking(EndSpot);
     }
     protected void fireWithPattern(Balls[] drumBallColors, Balls[] targetballcolors, double[] firingpositions){
         for(int i = 0; i <= 2; i++){
