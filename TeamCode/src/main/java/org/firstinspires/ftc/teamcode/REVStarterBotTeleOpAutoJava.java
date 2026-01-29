@@ -33,6 +33,14 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
   private ElapsedTime autoLaunchTimer = new ElapsedTime();
   private ElapsedTime autoDriveTimer = new ElapsedTime();
   AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+  private double[][] shooterLUT = {
+          {24.0, 1050},
+          {48.0, 1200},
+          {72.0, 1400},
+          {96.0, 1600},
+          {120.0, 1800},
+          {144.0, 2000}
+  };
 
   @Override
   public void runOpMode() {
@@ -112,19 +120,70 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
   private void doTeleOp() {
     if (opModeIsActive()) {
       while (opModeIsActive()) {
-        // Calling our methods while the OpMode is running
         splitStickArcadeDrive();
-        setFlywheelVelocity();
+        setFlywheelVelocity(); // This now runs the flywheel constantly
         manualCoreHexControl();
-        telemetry.addData("Flywheel Velocity", ((DcMotorEx) flywheel).getVelocity());
-        telemetry.addData("Flywheel Power", flywheel.getPower());
-        telemetry.update();
+
         aprilTagWebcam.update();
-        aprilTagWebcam.displayDetectionTelemetry(aprilTagWebcam.getTagBySpecificId(20));
-        aprilTagWebcam.displayDetectionTelemetry(aprilTagWebcam.getTagBySpecificId(24));
+
+        telemetry.addData("Flywheel Target", ((DcMotorEx) flywheel).getVelocity());
+        telemetry.update();
+
+        // REMOVED: ((DcMotorEx) flywheel).setVelocity(shootVelocity);
+        // (This line was previously overriding all your logic)
       }
     }
   }
+
+
+  private void setFlywheelVelocity() {
+    // 1. Get distance from AprilTag
+    org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection = aprilTagWebcam.getTagBySpecificId(targetID);
+
+    double currentRange = -1;
+    if (detection != null && detection.ftcPose != null) {
+      currentRange = detection.ftcPose.range;
+    }
+
+    // 2. Determine target velocity (Adjustable or Fallback)
+    double targetVelocity = 0;
+
+    if (currentRange != -1) {
+      // Interpolate distance from shooterLUT
+      if (currentRange <= shooterLUT[0][0]) {
+        targetVelocity = shooterLUT[0][1];
+      } else if (currentRange >= shooterLUT[shooterLUT.length - 1][0]) {
+        targetVelocity = shooterLUT[shooterLUT.length - 1][1];
+      } else {
+        for (int i = 0; i < shooterLUT.length - 1; i++) {
+          if (currentRange >= shooterLUT[i][0] && currentRange <= shooterLUT[i+1][0]) {
+            double d1 = shooterLUT[i][0], d2 = shooterLUT[i+1][0];
+            double v1 = shooterLUT[i][1], v2 = shooterLUT[i+1][1];
+            targetVelocity = v1 + (v2 - v1) * ((currentRange - d1) / (d2 - d1));
+            break;
+          }
+        }
+      }
+    } else {
+      // Use bankVelocity if no tag is seen
+      targetVelocity = bankVelocity;
+    }
+
+    // 3. APPLY VELOCITY CONSTANTLY
+    ((DcMotorEx) flywheel).setVelocity(targetVelocity);
+
+    // 4. CORE HEX ONLY ON BUMPERS
+    if (gamepad1.left_bumper || gamepad1.right_bumper) {
+      coreHex.setPower(1.0);
+    } else {
+      coreHex.setPower(0);
+    }
+
+    // Diagnostics
+    telemetry.addData("Shooter Mode", currentRange == -1 ? "FALLBACK (Bank)" : "AUTO-ADJUSTING");
+    telemetry.addData("Target RPM", targetVelocity);
+  }
+
 
 
   private void splitStickArcadeDrive() {
@@ -192,48 +251,8 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
    * Circle and Square will spin up ONLY the flywheel to the target velocity set.
    * The bumpers will activate the flywheel, and Core Hex feeder
    */
-  private void setFlywheelVelocity() {
-    if (gamepad1.options) {
-      flywheel.setPower(-0.5);
-    } else if (gamepad1.left_bumper) {
-      FAR_POWER_AUTO();
-    } else if (gamepad1.right_bumper) {
-      BANK_SHOT_AUTO();
-    } else if (gamepad1.square) {
-      ((DcMotorEx) flywheel).setVelocity(maxVelocity);
-    } else {
-      ((DcMotorEx) flywheel).setVelocity(0);
-      coreHex.setPower(0);
-    }
-  }
 
-//Automatic Flywheel controls used in Auto and TeleOp
 
-  /**
-   * The bank shot or near velocity is intended for launching balls touching or a few inches from the goal.
-   * When running this function, the flywheel will spin up and the Core Hex will wait before balls can be fed.
-   */
-  private void BANK_SHOT_AUTO() {
-    ((DcMotorEx) flywheel).setVelocity(bankVelocity);
-    if (((DcMotorEx) flywheel).getVelocity() >= bankVelocity - 50) {
-      coreHex.setPower(1);
-    } else {
-      coreHex.setPower(0);
-    }
-  }
-
-  /**
-   * The far power velocity is intended for launching balls a few feet from the goal. It may require adjusting the deflector.
-   * When running this function, the flywheel will spin up and the Core Hex will wait before balls can be fed.
-   */
-  private void FAR_POWER_AUTO() {
-    ((DcMotorEx) flywheel).setVelocity(farVelocity);
-    if (((DcMotorEx) flywheel).getVelocity() >= farVelocity - 100) {
-      coreHex.setPower(1);
-    } else {
-      coreHex.setPower(0);
-    }
-  }
 
 //Autonomous Code
 //For autonomous, the robot will launch the pre-loaded 3 balls then back away from the goal, turn, and back up off the launch line.
@@ -251,7 +270,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       // Fire balls
       autoLaunchTimer.reset();
       while (opModeIsActive() && autoLaunchTimer.milliseconds() < 10000) {
-        BANK_SHOT_AUTO();
+
         telemetry.addData("Launcher Countdown", autoLaunchTimer.seconds());
         telemetry.update();
       }
@@ -311,7 +330,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       // Fire balls
       autoLaunchTimer.reset();
       while (opModeIsActive() && autoLaunchTimer.milliseconds() < 10000) {
-        BANK_SHOT_AUTO();
+
         telemetry.addData("Launcher Countdown", autoLaunchTimer.seconds());
         telemetry.update();
       }
@@ -331,7 +350,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       // Fire balls
       autoLaunchTimer.reset();
       while (opModeIsActive() && autoLaunchTimer.milliseconds() < 10000) {
-        BANK_SHOT_AUTO();
+
         telemetry.addData("Launcher Countdown", autoLaunchTimer.seconds());
         telemetry.update();
       }
@@ -391,7 +410,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
       // Fire balls
       autoLaunchTimer.reset();
       while (opModeIsActive() && autoLaunchTimer.milliseconds() < 10000) {
-        BANK_SHOT_AUTO();
+
         telemetry.addData("Launcher Countdown", autoLaunchTimer.seconds());
         telemetry.update();
       }
