@@ -31,7 +31,7 @@ public class MecanumDrive {
     private DcMotor backRightDrive = null;
 
     // TODO: likely change this back to 1
-    private final double SPIN_DAMPING = 2.0;   // higher means slower turning
+    private final double SPIN_DAMPING = 1.0;   // higher means slower turning
 
     public void init(HardwareMap hwMap) {
 
@@ -45,9 +45,9 @@ public class MecanumDrive {
         // Set the left motors in reverse which is needed for drive trains where the left
         // motors are opposite to the right ones.
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // This uses RUN_WITHOUT_ENCODER because we are using the dead wheels.
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

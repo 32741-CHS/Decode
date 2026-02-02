@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testOpModes;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -71,7 +71,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 @TeleOp(name = "Sensor: Color", group = "Sensor")
-//@Disabled
+@Disabled
 public class SensorColorML extends LinearOpMode {
 
   /** The colorSensor field will contain a reference to our color sensor hardware object */

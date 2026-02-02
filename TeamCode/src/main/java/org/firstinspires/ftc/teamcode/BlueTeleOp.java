@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.mechanisms.MecanumDrive;
 import org.firstinspires.ftc.teamcode.mechanisms.TurretServo;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 @TeleOp
-public class WebcamTestOpMode  extends OpMode {
+public class BlueTeleOp  extends OpMode {
     AprilTagsWebcam aprilTagWebcam = new AprilTagsWebcam();
     Launcher launcher = new Launcher();
     MecanumDrive drive = new MecanumDrive();
@@ -31,21 +31,22 @@ public class WebcamTestOpMode  extends OpMode {
         intake.init(hardwareMap);
         turret.init(hardwareMap);
         led.init(hardwareMap);
+        // turret.init(hardwareMap);
     }
 
     @Override
     public void loop() {
         //Update the vision portal
         aprilTagWebcam.update();
-        AprilTagDetection id585 = aprilTagWebcam.getTagBySpecificId(0); // TAG ID 24 is the red goal
-        aprilTagWebcam.displayDetectionTelemetry(id585);
+        AprilTagDetection id20 = aprilTagWebcam.getTagBySpecificId(20); // TAG ID 20 is the blue goal
+        aprilTagWebcam.displayDetectionTelemetry(id20);
         // NOTE: we will need a separate OPMODE (otherwise identical) that sets the target TAGID to BLUE (#20)
-        if (id585 != null && id585.ftcPose != null) {
+        if (id20 != null && id20.ftcPose != null) {
             numMissingTagReads = 0;
-            double angleToTag = id585.ftcPose.bearing;
+            double angleToTag = id20.ftcPose.bearing;
             turret.changeTurretByDegrees(angleToTag);
 
-            double distanceToGoalCM = id585.ftcPose.range;
+            double distanceToGoalCM = id20.ftcPose.range;
             launcher.setMotorVelocityForDistance(distanceToGoalCM);
             led.setLEDGreen();
             // NOTE: use this after distance vs speed has been measured and calibrated
@@ -71,7 +72,7 @@ public class WebcamTestOpMode  extends OpMode {
         //  launcher.setMotorVelocity();
 
 
-        if (gamepad2.right_trigger > .5) {
+        if (gamepad2.a) {
             //     if (!launcher.getTriggerActive()) {
             // TODO: maybe also check to see that launcher measured velocities are within 10%(?) of target velocity
             //         launcher.triggerFeeder();
@@ -88,11 +89,11 @@ public class WebcamTestOpMode  extends OpMode {
             launcher.stopLauncher();
         }
 
-        if (gamepad2.aWasPressed()) {
+        /*if (gamepad2.aWasPressed()) {
             launcher.incrementLaunchSpeed();
         } else if (gamepad2.bWasPressed()) {
             launcher.decrementLaunchSpeed();
-        }
+        }*/
 
         if (gamepad2.xWasPressed()) {
             turret.incrementTurretPosition();

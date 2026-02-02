@@ -17,7 +17,7 @@ public class Intake {
             // Set launcher motor to RUN_USING_ENCODER and BRAKE to slow down faster than coasting.
             Intake.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             Intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-            Intake.setDirection(DcMotor.Direction.FORWARD);
+            Intake.setDirection(DcMotor.Direction.REVERSE);
 
             stopIntake();
     }
