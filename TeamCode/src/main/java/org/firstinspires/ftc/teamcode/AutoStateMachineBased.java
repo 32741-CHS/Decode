@@ -13,6 +13,7 @@ import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.predictedmotif
 import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetx;
 import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyblue;
 import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyred;
+import static org.firstinspires.ftc.teamcode.Util.constants.PART_NAMES.drumslotarray;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinfiringposition;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinnullposition;
 import static org.firstinspires.ftc.teamcode.limelight.LimelightMotifSetting.limelightMotifSet;
@@ -73,9 +74,14 @@ public class AutoStateMachineBased extends LinearOpMode {
     public static double loadthreex = 30;
     public static double intaketimelength = 200;
     public static double loadtangent = 45;
+    public static double universalrotationoffset = -90;
 
     private AutoState currentstate = AutoState.Initialization;
     private int loadcount = 1;
+
+    DrumSlots targetslotforautolaunch = null;
+
+    int motifcyclingautofirearray = 0;
 
     protected boolean isred;
 
@@ -166,8 +172,8 @@ public class AutoStateMachineBased extends LinearOpMode {
 
 
                     if (currentpose.position.x < -movetolaunchzonexlimit && currentpose.position.y * mirrory < movetolaunchzoneylimit){
-                        if(loadcount < 2)currentstate = AutoState.RotateToTarget;//TODO warning BYPASS
-                        else currentstate = AutoState.RotateToTarget;
+                        if(motif[0] != unknown) currentstate = AutoState.RotateToTarget;
+                        else currentstate = AutoState.GetMotif;
 
                     }telemetry.addLine("retrying");
                     telemetry.update();
@@ -182,24 +188,29 @@ public class AutoStateMachineBased extends LinearOpMode {
                     currentpose = drive.localizer.getPose();
                     double motiftargetturn = atan2(predictedmotify - currentpose.position.y, predictedmotifx - currentpose.position.x);
                     Action turnTowardsMotif = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo((motiftargetturn - Math.PI/2) )
+                            .turnTo((motiftargetturn + Math.toRadians(universalrotationoffset)) )
                             .build();
                     Actions.runBlocking(turnTowardsMotif);
 
                     motif = limelightMotifSet(limelight);
+                    telemetry.addData("currentmotif0",motif[0]);
+                    telemetry.addData("currentmotif1",motif[1]);
+                    telemetry.addData("currentmotif2",motif[2]);
+                    telemetry.update();
+                    sleep(10000);
 
+                    //TODO fix this garbage
                     if (motif[0] != unknown || motiftime.milliseconds() > motiftimelimitms){
                         //if it breaks on time than it sets a fallback motif
                         if (motif[0] == unknown) motif = new Balls[]{purple, purple, green};
                         currentstate = AutoState.RotateToTarget;
-                    } telemetry.addLine("retrying");
+                    }
+                    telemetry.addLine("retrying");
                     telemetry.update();
                     break;
 
                 case RotateToTarget:
-                    //TODO NOTE BYPASS
-                    motif = new Balls[]{purple, purple, green};
-                    telemetry.addData("currentmotif",motif[0]);
+
                     telemetry.addLine("rotating to target");
                     telemetry.update();
 
@@ -215,7 +226,7 @@ public class AutoStateMachineBased extends LinearOpMode {
                     double robotautoaimtargetangle = atan2(arctanintermediatey, arctanintermediatex);
 
                     Action rotatetotargetangle = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo(robotautoaimtargetangle - Math.PI)
+                            .turnTo(robotautoaimtargetangle - Math.PI + Math.toRadians(universalrotationoffset) )
                             .build();
                     Actions.runBlocking(rotatetotargetangle);
                     if(Math.abs(drive.localizer.getPose().heading.toDouble() - robotautoaimtargetangle) < autoaimvariancelimiter){
@@ -229,6 +240,32 @@ public class AutoStateMachineBased extends LinearOpMode {
                     telemetry.update();
                     ElapsedTime shootingtime = new ElapsedTime();
 
+                    //TODO check if this works now
+
+                    if(targetslotforautolaunch != null){
+                        DrumServo.setPosition(targetslotforautolaunch.shootPosition);
+                        sleep(600);
+                        FiringPinServo.setPosition(firingpinfiringposition);
+                        sleep(200);
+                        FiringPinServo.setPosition(firingpinnullposition);
+                        sleep(200);
+                    }
+                    if (targetslotforautolaunch == null) {
+                        Balls currentcolor = motif[motifcyclingautofirearray];
+                        motifcyclingautofirearray++;
+                        if(motifcyclingautofirearray > 2) motifcyclingautofirearray = 2;
+
+                        for (DrumSlots slot : drumslotarray) {
+                            if (slot.getLoadedBall() == currentcolor) {
+                                targetslotforautolaunch = slot;
+                                slot.setLoadedBall(unknown);
+                                break;
+                            }
+                        }
+                    }
+
+                        /*
+                    }
                     for(Balls currentcolor : motif){
                         for(DrumSlots slot : drumslotarray){
                             if (currentcolor == slot.getLoadedBall()){
@@ -246,7 +283,7 @@ public class AutoStateMachineBased extends LinearOpMode {
 
                             }
                         }
-                    }
+                    }*/
                     for(DrumSlots slot : drumslotarray) {
 
                         if (slot.getLoadedBall() != unknown) break;
@@ -284,7 +321,7 @@ public class AutoStateMachineBased extends LinearOpMode {
                             .build();
                     Actions.runBlocking(DriveToBeforeLoad);
                     Action TurnToBeforeLoad = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo(Math.toRadians(90)*mirrory)
+                            .turnTo(Math.toRadians(90)*mirrory + Math.toRadians(universalrotationoffset))
                             .build();
                     Actions.runBlocking(TurnToBeforeLoad);
                     if(Math.abs(drive.localizer.getPose().heading.toDouble() - Math.PI/2) >3) Actions.runBlocking(TurnToBeforeLoad);
@@ -312,8 +349,6 @@ public class AutoStateMachineBased extends LinearOpMode {
                                 @Override
                                 public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
-
-                                    // TODO make sure switch this back to color sensing for comp
                                     Balls loadedcolor = colorDetection(colorSensor1, colorSensor2);
 
                                     Scooper.setVelocity(-999, AngleUnit.RADIANS);
