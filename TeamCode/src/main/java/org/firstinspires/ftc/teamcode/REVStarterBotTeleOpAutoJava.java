@@ -60,7 +60,7 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
     coreHex.setDirection(DcMotor.Direction.REVERSE);
     frontLeft.setDirection(DcMotor.Direction.REVERSE);
     backLeft.setDirection(DcMotor.Direction.REVERSE);
-    intake.setDirection(DcMotorSimple.Direction.REVERSE);
+    intake.setDirection(DcMotor.Direction.REVERSE);
 
     //On initilization the Driver Station will prompt for which OpMode should be run - Auto Blue, Auto Red, or TeleOp
     while (opModeInInit()) {
@@ -131,7 +131,6 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
 
         telemetry.addData("Flywheel Target", ((DcMotorEx) flywheel).getVelocity());
         telemetry.update();
-        intake.setPower(1);
 
         // REMOVED: ((DcMotorEx) flywheel).setVelocity(shootVelocity);
         // (This line was previously overriding all your logic)
@@ -237,11 +236,11 @@ public class REVStarterBotTeleOpAutoJava extends LinearOpMode {
    * Manual control for the Core Hex powered feeder
    */
   private void manualCoreHexControl() {
-    // Manual control for the Core Hex intake
+    // Manual control for the intake
     if (gamepad1.cross) {
-      coreHex.setPower(0.5);
+      intake.setPower(-1);
     } else if (gamepad1.triangle) {
-      coreHex.setPower(-0.5);
+      intake.setPower(0);
     }
     if (gamepad1.dpad_left) {
       targetID = 20;
