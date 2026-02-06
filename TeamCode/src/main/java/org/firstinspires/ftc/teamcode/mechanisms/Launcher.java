@@ -19,6 +19,8 @@ public class Launcher {
     private final double FEED_STOP = 0.0;
     private final double FEED_START = 1.0;
 
+    private final double FEED_REVERSE = -1.0;
+
     public DcMotorEx lowerLaunch;
     public DcMotorEx upperLaunch;
     private DcMotorEx launchFeeder;
@@ -272,6 +274,10 @@ public class Launcher {
             throw new RuntimeException(e);
         }
         resetFeeder();*/
+    }
+
+    public void unloadBall () {
+        launchFeeder.setPower(FEED_REVERSE);
     }
 
 
