@@ -90,11 +90,12 @@ public class MoveToTwoPositions extends LinearOpMode {
             startPose = drive.localizer.getPose();
 
             Action movethree = drive.actionBuilder(startPose)
-                    .splineToConstantHeading(new Vector2d(-xdistance, ydistance), Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-xdistance, -ydistance), Math.toRadians(0))
                     .build();
             Actions.runBlocking(movethree);
             startPose = drive.localizer.getPose();
 
+            /*
             Action movefour = drive.actionBuilder(startPose)
                     .splineToConstantHeading(new Vector2d(-xdistance, -ydistance), Math.toRadians(0))
                     .build();
@@ -118,7 +119,7 @@ public class MoveToTwoPositions extends LinearOpMode {
                     .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(0))
                     .build();
             Actions.runBlocking(movetoloadingtwo);
-            startPose = drive.localizer.getPose();
+            startPose = drive.localizer.getPose();*/
         }
     }
 }
