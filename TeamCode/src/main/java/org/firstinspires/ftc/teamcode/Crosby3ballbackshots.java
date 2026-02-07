@@ -155,7 +155,7 @@ public class Crosby3ballbackshots extends LinearOpMode {
 
                     if (loadcount == 3) movetolaunchzonetangent = 0;
                     Action drivetolaunchzone = drive.actionBuilder(drive.localizer.getPose())
-                            .splineToConstantHeading(new Vector2d(54, 15 * mirrory), movetolaunchzonetangent)
+                            .splineToConstantHeading(new Vector2d(54, 10 * mirrory), movetolaunchzonetangent)
                             .build();
                     Actions.runBlocking(drivetolaunchzone);
                     currentpose = drive.localizer.getPose();
