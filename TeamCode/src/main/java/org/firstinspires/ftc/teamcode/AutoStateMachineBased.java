@@ -55,24 +55,33 @@ public class AutoStateMachineBased extends LinearOpMode {
 
 
     public static double movetolaunchzonetangent = 0;
-    public static double targetangnle = 120;
+    public static double targetangnle = -50;
+    public static double zonepretargetx = 0;
+    public static double loadoneprex = -18;
+    public static double loadtwoprex = 0;
+    public static double loadthreeprex = 26;
+
     public static double movetolaunchzonexlimit = 22.5;
     public static double movetolaunchzoneylimit = 25;
     public static double motiftimelimitms = 5;
     public static double autoaimvariancelimiter = 300000;
     public static double preloadingy = 10;
-    public static double ballpickupy = 60;
+    public static double ballpickupy = 55;
     public static double loadonex = -10;
-    public static double loadtwox = 36;
+    public static double loadtwox = 16;
     public static double loadthreex = 30;
-    public static double intaketimelength = 200;
+    public static double intaketimelength = 3500;
     public static double loadtangent = 45;
-    public static double universalrotationoffset = -90;
-    public static double launchzoneredx = -22.5;
+    public static double universalrotationoffset = 0;
+    public static double launchzoneredx = -30.5;
     public static double launchzonetargety = 22;
+    public static double launchspeed = -3.3;
+    public static Boolean pullout = false;
+    double zonetargetx = 0;
 
     private AutoState currentstate = AutoState.Initialization;
     private int loadcount = 1;
+
 
     DrumSlots targetslotforautolaunch = null;
 
@@ -129,7 +138,6 @@ public class AutoStateMachineBased extends LinearOpMode {
 
         telemetry.addData("mirroiry",mirrory);
         telemetry.update();
-        sleep(1000);
 
         Pose2d currentpose = new Pose2d(-62, 32.5 * mirrory, 0 + Math.toRadians(universalrotationoffset));
         MecanumDrive drive = new MecanumDrive(  hardwareMap, currentpose);
@@ -150,7 +158,7 @@ public class AutoStateMachineBased extends LinearOpMode {
                     SLOT_1.setLoadedBall(purple);
                     SLOT_2.setLoadedBall(purple);
 
-                    LauncherFL.setVelocity(-3.5, AngleUnit.RADIANS);
+                    LauncherFL.setVelocity(launchspeed, AngleUnit.RADIANS);
                     FiringPinServo.setPosition(firingpinnullposition);
                     DrumServo.setPosition(0.1);
 
@@ -163,12 +171,19 @@ public class AutoStateMachineBased extends LinearOpMode {
 
                     if(loadcount == 3) movetolaunchzonetangent = 0;
 
-                    Action drivetolaunchzone = drive.actionBuilder(drive.localizer.getPose())
-                            .splineToConstantHeading(new Vector2d( launchzoneredx, launchzonetargety * mirrory),movetolaunchzonetangent)
-                            .build();
+                    Action drivetolaunchzone;
+                    if(pullout){
+                        drivetolaunchzone = drive.actionBuilder(drive.localizer.getPose())
+                                .strafeTo(new Vector2d(drive.localizer.getPose().position.x, launchzonetargety * mirrory))
+                                .strafeTo(new Vector2d(launchzoneredx, launchzonetargety * mirrory))
+                                .build();
+                    }else {
+                        drivetolaunchzone = drive.actionBuilder(drive.localizer.getPose())
+                                .strafeTo(new Vector2d(launchzoneredx, launchzonetargety * mirrory))
+                                .build();
+                    }
                     Actions.runBlocking(drivetolaunchzone);
                     currentpose = drive.localizer.getPose();
-
 
                     if (Math.abs(launchzonetargety - currentpose.position.y * mirrory) < movetolaunchzoneylimit){
                         if(motif[0] != unknown) currentstate = AutoState.RotateToTarget;
@@ -185,9 +200,11 @@ public class AutoStateMachineBased extends LinearOpMode {
                     ElapsedTime motiftime = new ElapsedTime();
 
                     currentpose = drive.localizer.getPose();
+                    double motifoffset = Math.PI;
+                    if(!isred) motifoffset = 0;
                     double motiftargetturn = Math.atan2(predictedmotify - currentpose.position.y, predictedmotifx - currentpose.position.x);
                     Action turnTowardsMotif = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo(motiftargetturn)
+                            .turnTo(motiftargetturn + motifoffset)
                             .build();
                     Actions.runBlocking(turnTowardsMotif);
 
@@ -196,7 +213,7 @@ public class AutoStateMachineBased extends LinearOpMode {
                     telemetry.addData("currentmotif1",motif[1]);
                     telemetry.addData("currentmotif2",motif[2]);
                     telemetry.update();
-                    sleep(1000);
+
 
                     //TODO fix this garbage
                     if (motif[0] != unknown || motiftime.milliseconds() > motiftimelimitms){
@@ -222,10 +239,11 @@ public class AutoStateMachineBased extends LinearOpMode {
 
                     arctanintermediatey = usedy - drive.localizer.getPose().position.y;
 
-                    double robotautoaimtargetangle = Math.atan2(arctanintermediatey, arctanintermediatex);
+                    if(loadcount > 1) targetangnle = -55;
+                    double robotautoaimtargetangle = Math.toRadians(targetangnle);//Math.atan2(arctanintermediatey, arctanintermediatex);
 
                     Action rotatetotargetangle = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo(robotautoaimtargetangle)
+                            .turnTo(robotautoaimtargetangle + Math.PI/2)
                             .build();
                     Actions.runBlocking(rotatetotargetangle);
                     if(Math.abs(drive.localizer.getPose().heading.toDouble() - robotautoaimtargetangle) < autoaimvariancelimiter){
@@ -256,41 +274,22 @@ public class AutoStateMachineBased extends LinearOpMode {
                     motifcyclingautofirearray++;
                     if(motifcyclingautofirearray > 2) motifcyclingautofirearray = 2;
 
-
                     for (DrumSlots slot : drumslotarray) {
                         if (slot.getLoadedBall() == currentcolor) {
                             targetslotforautolaunch = slot;
-
                             break;
                         }
                     }
 
-
-                        /*
-                    }
-                    for(Balls currentcolor : motif){
-                        for(DrumSlots slot : drumslotarray){
-                            if (currentcolor == slot.getLoadedBall()){
-                                telemetry.addData("target color", currentcolor);
-                                telemetry.addData("selected slot color", slot.getLoadedBall());
-
-                                slot.setLoadedBall(unknown);
-
-                                DrumServo.setPosition(slot.shootPosition);
-                                sleep(600);
-                                FiringPinServo.setPosition(firingpinfiringposition);
-                                sleep(200);
-                                FiringPinServo.setPosition(firingpinnullposition);
-                                sleep(200);
-
-                            }
-                        }
-                    }*/
-                    for(DrumSlots slot : drumslotarray) {
-
+                    for (DrumSlots slot : drumslotarray) {
                         if (slot.getLoadedBall() != unknown) break;
-                        else currentstate = AutoState.MoveToLoadZone;
+                        if (slot == SLOT_2) {
+                            currentstate = AutoState.MoveToLoadZone;
+                            motifcyclingautofirearray = 0;
+                            break;
+                        }
                     }
+
 
                     telemetry.addData("s0",SLOT_0.getLoadedBall());
                     telemetry.addData("s1",SLOT_1.getLoadedBall());
@@ -305,28 +304,35 @@ public class AutoStateMachineBased extends LinearOpMode {
                     telemetry.addData("loadcount",loadcount);
                     telemetry.update();
 
-                    double zonetargetx = 0;
+
                     switch (loadcount){
                         case 1:
                             zonetargetx = loadonex;
+                            zonepretargetx = loadoneprex;
                             break;
                         case 2:
                             zonetargetx = loadtwox;
+                            zonepretargetx = loadtwoprex;
                             break;
                         case 3:
                             zonetargetx = loadthreex;
+                            zonepretargetx = loadthreeprex;
                             break;
                     }
 
+
                     Action DriveToBeforeLoad = drive.actionBuilder(drive.localizer.getPose())
-                            .splineToConstantHeading(new Vector2d(zonetargetx,preloadingy * mirrory),Math.toRadians(loadtangent *mirrory ))
+                            .strafeTo(new Vector2d(zonetargetx,preloadingy * mirrory))
                             .build();
                     Actions.runBlocking(DriveToBeforeLoad);
+                    double turnangleforloading = 0;
+                    if(!isred) turnangleforloading = 180;
+
                     Action TurnToBeforeLoad = drive.actionBuilder(drive.localizer.getPose())
-                            .turnTo(Math.toRadians(90)*mirrory )
+                            .turnTo(Math.toRadians(turnangleforloading))
                             .build();
                     Actions.runBlocking(TurnToBeforeLoad);
-                    if(Math.abs(drive.localizer.getPose().heading.toDouble() - Math.PI/2) >3) Actions.runBlocking(TurnToBeforeLoad);
+                    //if(Math.abs(drive.localizer.getPose().heading.toDouble() - Math.PI/2) >3) Actions.runBlocking(TurnToBeforeLoad);
                     telemetry.update();
                     currentstate = AutoState.LoadBalls;
                     break;
@@ -340,9 +346,10 @@ public class AutoStateMachineBased extends LinearOpMode {
 
                     double[] drumlocations = {SLOT_0.loadPosition,SLOT_1.loadPosition, SLOT_2.loadPosition};
 
+                    ////.splineToConstantHeading(new Vector2d(drive.localizer.getPose().position.x, ballpickupy * mirrory),Math.toRadians(0))
                     Action pickUpLoadOne = new ParallelAction(
                             drive.actionBuilder(drive.localizer.getPose())
-                                    .splineToConstantHeading(new Vector2d(drive.localizer.getPose().position.x, ballpickupy * mirrory),Math.toRadians(90))
+                                    .strafeTo(new Vector2d(zonetargetx, ballpickupy * mirrory))
                                     .build(),
                             new Action() {
                                 Boolean fullyloaded = false;
@@ -377,18 +384,24 @@ public class AutoStateMachineBased extends LinearOpMode {
                     Actions.runBlocking(pickUpLoadOne);
 
 
+                    telemetry.addData("pullingout",drive.localizer.getPose().position.y);
+                    telemetry.update();
+                    //sleep(5000);
+
                     Scooper.setVelocity(0);
+                    pullout = loadcount > 1;
+                    /*
                     Action PullOut = drive.actionBuilder(drive.localizer.getPose())
-                            .lineToYConstantHeading(30 * mirrory)
+                            .splineToConstantHeading(new Vector2d(drive.localizer.getPose().position.x, launchzonetargety * mirrory),Math.toRadians(0))
                             .build();
-                    Actions.runBlocking(PullOut);
+                    Actions.runBlocking(PullOut);//*/
 
 
                     switch (loadcount){
                         case 1:
-                            SLOT_0.setLoadedBall(purple);
+                            SLOT_0.setLoadedBall(green);
                             SLOT_1.setLoadedBall(purple);
-                            SLOT_2.setLoadedBall(green);
+                            SLOT_2.setLoadedBall(purple);
                         case 2:
                             SLOT_0.setLoadedBall(purple);
                             SLOT_1.setLoadedBall(green);

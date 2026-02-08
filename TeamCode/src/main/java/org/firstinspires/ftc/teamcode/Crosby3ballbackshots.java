@@ -188,7 +188,6 @@ public class Crosby3ballbackshots extends LinearOpMode {
                     telemetry.addData("currentmotif1", motif[1]);
                     telemetry.addData("currentmotif2", motif[2]);
                     telemetry.update();
-                    sleep(10000);
 
                     //TODO fix this garbage
                     if (motif[0] != unknown || motiftime.milliseconds() > motiftimelimitms) {
@@ -220,9 +219,9 @@ public class Crosby3ballbackshots extends LinearOpMode {
                             .turnTo(robotautoaimtargetangle - Math.PI + Math.toRadians(universalrotationoffset))
                             .build();
                     Actions.runBlocking(rotatetotargetangle);
-                    if (Math.abs(drive.localizer.getPose().heading.toDouble() - robotautoaimtargetangle) < autoaimvariancelimiter) {
+                    //if (Math.abs(drive.localizer.getPose().heading.toDouble() - robotautoaimtargetangle) < autoaimvariancelimiter) {
                         currentstate = AutoState.FireWithMotif;
-                    }
+                    //}
                     telemetry.addLine("retrying");
                     telemetry.update();
                     break;
@@ -316,8 +315,8 @@ public class Crosby3ballbackshots extends LinearOpMode {
                             .turnTo(Math.toRadians(90) * mirrory + Math.toRadians(universalrotationoffset))
                             .build();
                     Actions.runBlocking(TurnToBeforeLoad);
-                    if (Math.abs(drive.localizer.getPose().heading.toDouble() - Math.PI / 2) > 3)
-                        Actions.runBlocking(TurnToBeforeLoad);
+                    //if (Math.abs(drive.localizer.getPose().heading.toDouble() - Math.PI / 2) > 3)
+                    Actions.runBlocking(TurnToBeforeLoad);
                     telemetry.update();
                     currentstate = AutoState.LoadBalls;
                     break;

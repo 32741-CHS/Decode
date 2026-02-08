@@ -200,13 +200,12 @@ public class BaseOpModeAutoAimCrosby extends LinearOpMode {
             if(gamepad1.a){
                 targetdrumangle = SLOT_0.loadPosition;
                 targetdrumslot = 0;
-
-            }
-            if(gamepad1.b){
                 SLOT_0.setLoadedBall(unknown);
                 SLOT_1.setLoadedBall(unknown);
                 SLOT_2.setLoadedBall(unknown);
+
             }
+
 
             if (gamepad2.a) {//firing bin controls
                 targetfiringpinangle = firingpinnullposition - .32  ;
