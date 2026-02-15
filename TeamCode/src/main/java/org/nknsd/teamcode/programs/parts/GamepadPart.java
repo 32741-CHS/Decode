@@ -6,7 +6,6 @@ import org.nknsd.teamcode.components.drivers.LiftDriver;
 import org.nknsd.teamcode.components.drivers.MixedInputWheelDriver;
 import org.nknsd.teamcode.components.drivers.SRSDriver;
 import org.nknsd.teamcode.components.handlers.gamepad.GamePadHandler;
-import org.nknsd.teamcode.components.handlers.srs.SRSIntakeState;
 import org.nknsd.teamcode.components.utility.StateMachine;
 import org.nknsd.teamcode.controlSchemes.defaults.FiringControlScheme;
 import org.nknsd.teamcode.controlSchemes.defaults.IntakeControlScheme;
@@ -66,6 +65,6 @@ public class GamepadPart extends ProgramPart {
         intakeControlScheme.link(gamePadHandler);
         liftDriver.link(gamePadHandler, setup.getBalancedLiftHandler(), liftControlScheme);
         liftControlScheme.link(gamePadHandler);
-        srsDriver.link(gamePadHandler, srsControlScheme, StateMachine.INSTANCE, setup.getPeakPointer(), setup.getMicrowaveScoopHandler(), setup.getSlotTracker(), setup.getArtifactSystem());
+        srsDriver.link(gamePadHandler, srsControlScheme, StateMachine.INSTANCE, setup.getMicrowaveScoopHandler(), setup.getSlotTracker(), setup.getArtifactSystem());
     }
 }

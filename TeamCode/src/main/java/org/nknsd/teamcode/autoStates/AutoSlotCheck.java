@@ -21,7 +21,7 @@ public class AutoSlotCheck extends StateMachine.State {
     @Override
     protected void run(ElapsedTime runtime, Telemetry telemetry) {
         if (!scanStarted) {
-            scanStarted = artifactSystem.scanWithOverride();
+            scanStarted = artifactSystem.scanAll();
         }
         if (artifactSystem.isReady() && scanStarted) {
             StateMachine.INSTANCE.stopAnonymous(this);

@@ -8,9 +8,6 @@ import org.nknsd.teamcode.components.handlers.artifact.MicrowaveScoopHandler;
 import org.nknsd.teamcode.components.handlers.artifact.SlotTracker;
 import org.nknsd.teamcode.components.handlers.artifact.states.IntakeBallState;
 import org.nknsd.teamcode.components.handlers.color.BallColor;
-import org.nknsd.teamcode.components.handlers.odometry.AbsolutePosition;
-import org.nknsd.teamcode.components.motormixers.AutoPositioner;
-import org.nknsd.teamcode.components.utility.IntPoint;
 import org.nknsd.teamcode.components.utility.RobotVersion;
 import org.nknsd.teamcode.components.utility.StateMachine;
 import org.nknsd.teamcode.components.utility.feedbackcontroller.PidController;
@@ -19,7 +16,10 @@ public class SRSIntakeState extends StateMachine.State {
 
     final private PeakPointer peakPointer;
     final private boolean eat;
-    final private boolean killself;
+    final private boolean killSelf;
+
+    private final PidController pidH;
+    private final PidController pidXY;
 
     private final String[] toStopOnEnd;
     private final String[] toStartOnEnd;
@@ -29,17 +29,21 @@ public class SRSIntakeState extends StateMachine.State {
     private ArtifactSystem artifactSystem;
 
 
-    public SRSIntakeState(PeakPointer peakPointer, boolean killSelf, String[] toStopOnEnd, String[] toStartOnEnd) {
+    public SRSIntakeState(PeakPointer peakPointer, boolean killSelf, PidController pidH, PidController pidXY, String[] toStopOnEnd, String[] toStartOnEnd) {
         this.peakPointer = peakPointer;
-        this.killself = killSelf;
+        this.killSelf = killSelf;
+        this.pidH = pidH;
+        this.pidXY = pidXY;
         this.toStopOnEnd = toStopOnEnd;
         this.toStartOnEnd = toStartOnEnd;
         eat = false;
     }
 
-    public SRSIntakeState(PeakPointer peakPointer, boolean killSelf, MicrowaveScoopHandler microwaveScoopHandler, SlotTracker slotTracker, ArtifactSystem artifactSystem, String[] toStopOnEnd, String[] toStartOnEnd) {
+    public SRSIntakeState(PeakPointer peakPointer, boolean killSelf, PidController pidH, PidController pidXY, MicrowaveScoopHandler microwaveScoopHandler, SlotTracker slotTracker, ArtifactSystem artifactSystem, String[] toStopOnEnd, String[] toStartOnEnd) {
         this.peakPointer = peakPointer;
-        this.killself = killSelf;
+        this.killSelf = killSelf;
+        this.pidH = pidH;
+        this.pidXY = pidXY;
         this.toStopOnEnd = toStopOnEnd;
         this.toStartOnEnd = toStartOnEnd;
         this.microwaveScoopHandler = microwaveScoopHandler;
@@ -50,25 +54,26 @@ public class SRSIntakeState extends StateMachine.State {
 
     @Override
     protected void run(ElapsedTime runtime, Telemetry telemetry) {
-        if (killself && peakPointer.targetAcquired() && !eat) {
+        if (killSelf && peakPointer.targetAcquired() && !eat) {
             StateMachine.INSTANCE.stopAnonymous(this);
         }
     }
 
     @Override
     protected void started() {
+        peakPointer.setPids(pidH, pidXY);
         peakPointer.enableTargeting(true, eat);
 
         if (eat) {
             int slot = 0;
             for (int i = 0; i < 3; i++) {
                 BallColor color = slotTracker.getSlotColor(i);
-                if (color == BallColor.NOTHING) {
+                if (color == BallColor.NOTHING || color == BallColor.UNSURE) {
                     slot = i;
                 }
             }
 
-            if (killself) {
+            if (killSelf) {
                 StateMachine.INSTANCE.startAnonymous(new IntakeBallState(microwaveScoopHandler, slotTracker, artifactSystem, slot, false, new String[]{name}, new String[]{}));
             } else {
                 StateMachine.INSTANCE.startAnonymous(new IntakeBallState(microwaveScoopHandler, slotTracker, artifactSystem, slot, false, new String[]{}, new String[]{}));

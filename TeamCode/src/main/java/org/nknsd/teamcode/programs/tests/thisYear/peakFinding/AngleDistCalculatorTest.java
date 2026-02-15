@@ -5,18 +5,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.nknsd.teamcode.components.handlers.gamepad.AdvancedTelemetry;
-import org.nknsd.teamcode.components.handlers.srs.AngleCalculator;
+import org.nknsd.teamcode.components.handlers.srs.AngleDistCalculator;
 import org.nknsd.teamcode.components.handlers.srs.PeakFinder;
 import org.nknsd.teamcode.components.handlers.srs.SRSHubHandler;
-import org.nknsd.teamcode.components.utility.IntPoint;
+import org.nknsd.teamcode.components.utility.SensorGridPoint;
 import org.nknsd.teamcode.components.utility.StateMachine;
 import org.nknsd.teamcode.frameworks.NKNComponent;
 import org.nknsd.teamcode.frameworks.NKNProgram;
 
 import java.util.List;
 
-@TeleOp(name="Angle Calculator Test", group="Tests")
-public class AngleCalculatorTest extends NKNProgram {
+@TeleOp(name="SRS Angle-Dist Calculator Test", group="Tests")
+public class AngleDistCalculatorTest extends NKNProgram {
     private class AngleTestState extends StateMachine.State {
         private final SRSHubHandler srsHubHandler;
         private final PeakFinder peakFinder;
@@ -26,28 +26,30 @@ public class AngleCalculatorTest extends NKNProgram {
             this.srsHubHandler = srsHubHandler;
             this.peakFinder = peakFinder;
             this.advancedTelemetry = advancedTelemetry;
+            srsHubHandler.getMeans("meanFile.csv");
         }
 
         @Override
         protected void run(ElapsedTime runtime, Telemetry telemetry) {
             short[][] data = srsHubHandler.getNormalizedDists();
-            IntPoint ballPoint = peakFinder.altPeakFind(data);
+            SensorGridPoint ballPoint = peakFinder.findClosestPeak(data);
 
-            // IF THE DATA BECOMES NOT SQUARE WE HAVE A PROBLEM HOUSTON.
-            if (ballPoint.getX() < 0 || ballPoint.getX() > data.length || ballPoint.getY() < 0 || ballPoint.getY() > data[0].length) {
-                advancedTelemetry.modifyData("Offset Angle", "no ball :P");
-                advancedTelemetry.modifyData("Ball X", "unknown (" + ballPoint.getX() + ")");
-                advancedTelemetry.modifyData("Ball Y", "unknown (" + ballPoint.getY() + ")");
-                advancedTelemetry.modifyData("Distance", "unkown");
+            if (ballPoint == null ) {
+
+                advancedTelemetry.modifyData("Ball X", "unknown");
+                advancedTelemetry.modifyData("Ball Y", "unknown");
+                advancedTelemetry.modifyData("Ball Angle", "unknown");
+                advancedTelemetry.modifyData("Ball Distance", "unknown");
                 return;
             }
 
-            int ballXPos = ballPoint.getX();
-            int ballDist = srsHubHandler.getDistances()[ballXPos][ballPoint.getY()];
-            advancedTelemetry.modifyData("Ball X", ballXPos);
+            double angle = AngleDistCalculator.calculateHeadingAngle(ballPoint);
+            double dist = AngleDistCalculator.calculateDistance(ballPoint);
+
+            advancedTelemetry.modifyData("Ball X", ballPoint.getX());
             advancedTelemetry.modifyData("Ball Y", ballPoint.getY());
-            advancedTelemetry.modifyData("Distance", ballDist);
-            advancedTelemetry.modifyData("Offset Angle", AngleCalculator.calculateHeadingOffset(ballXPos, ballDist) * 180 / 3.14159);
+            advancedTelemetry.modifyData("Ball Angle", angle);
+            advancedTelemetry.modifyData("Ball Distance", dist);
         }
 
         @Override

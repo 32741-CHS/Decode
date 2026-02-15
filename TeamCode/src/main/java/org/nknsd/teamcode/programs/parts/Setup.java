@@ -12,7 +12,6 @@ import org.nknsd.teamcode.components.handlers.launch.LauncherHandler;
 import org.nknsd.teamcode.components.handlers.launch.TrajectoryHandler;
 import org.nknsd.teamcode.components.handlers.odometry.AbsolutePosition;
 import org.nknsd.teamcode.components.handlers.srs.PeakFinder;
-import org.nknsd.teamcode.components.handlers.srs.PeakPointer;
 import org.nknsd.teamcode.components.handlers.srs.SRSHubHandler;
 import org.nknsd.teamcode.components.handlers.vision.BasketLocator;
 import org.nknsd.teamcode.components.handlers.vision.TargetingSystem;
@@ -35,7 +34,12 @@ public class Setup extends ProgramPart {
     private ArtifactSystem artifactSystem;
     private PowerInputMixer powerInputMixer;
     private BalancedLiftHandler balancedLiftHandler;
-    private PeakPointer peakPointer;
+
+    public SRSHubHandler getSrsHubHandler() {
+        return srsHubHandler;
+    }
+
+    private SRSHubHandler srsHubHandler;
 
     public SlotTracker getSlotTracker() {
         return slotTracker;
@@ -61,10 +65,6 @@ public class Setup extends ProgramPart {
 
     public LaunchSystem getLaunchSystem() {
         return launchSystem;
-    }
-
-    public PeakPointer getPeakPointer() {
-        return peakPointer;
     }
 
     public TargetingSystem getTargetingSystem() {
@@ -96,6 +96,14 @@ public class Setup extends ProgramPart {
         return balancedLiftHandler;
     }
 
+
+    boolean scanOnStart = true, enableTelemetry = true;
+
+    public void changeEnableSettings(boolean scanOnStart, boolean enableTelemetry){
+        this.scanOnStart = scanOnStart;
+        this.enableTelemetry = enableTelemetry;
+    }
+
     @Override
     public void createComponents(List<NKNComponent> components, List<NKNComponent> telemetryEnabled) {
 
@@ -107,18 +115,24 @@ public class Setup extends ProgramPart {
 //        firing
         TrajectoryHandler trajectoryHandler = new TrajectoryHandler();
         components.add(trajectoryHandler);
-        telemetryEnabled.add(trajectoryHandler);
+        if (enableTelemetry) {
+            telemetryEnabled.add(trajectoryHandler);
+        }
 
         LauncherHandler launcherHandler = new LauncherHandler(0.95, 1.10);
         components.add(launcherHandler);
-        telemetryEnabled.add(launcherHandler);
+        if (enableTelemetry) {
+            telemetryEnabled.add(launcherHandler);
+        }
         launcherHandler.setEnabled(true);
 
         launchSystem = new LaunchSystem(RobotVersion.INSTANCE.launchSpeedInterpolater, RobotVersion.INSTANCE.launchAngleInterpolater, 2, 16, 132);
 
         firingSystem = new FiringSystem();
         components.add(firingSystem);
-//        telemetryEnabled.add(firingSystem);
+        if (enableTelemetry) {
+            telemetryEnabled.add(firingSystem);
+        }
 
 
 //        microwave and artifact system
@@ -163,27 +177,29 @@ public class Setup extends ProgramPart {
 //        apriltag tracking
         aprilTagSensor = new AprilTagSensor();
         components.add(aprilTagSensor);
-        telemetryEnabled.add(aprilTagSensor);
+        if (enableTelemetry) {
+            telemetryEnabled.add(aprilTagSensor);
+        }
 
         BasketLocator basketLocator = new BasketLocator(RobotVersion.INSTANCE.aprilDistanceInterpolater);
         components.add(basketLocator);
-//        telemetryEnabled.add(basketLocator);
+        if (enableTelemetry) {
+            telemetryEnabled.add(basketLocator);
+        }
 
-        targetingSystem = new TargetingSystem(RobotVersion.INSTANCE.aprilTargetingPid);
+        targetingSystem = new TargetingSystem(RobotVersion.INSTANCE.ballEatingPidXY);
         components.add(targetingSystem);
-        telemetryEnabled.add(targetingSystem);
+        if (enableTelemetry) {
+            telemetryEnabled.add(targetingSystem);
+        }
 
 
         balancedLiftHandler = new BalancedLiftHandler();
         components.add(basketLocator);
 
 
-        SRSHubHandler srsHubHandler = new SRSHubHandler();
+        srsHubHandler = new SRSHubHandler();
         components.add(srsHubHandler);
-
-        PeakFinder peakFinder = new PeakFinder();
-        peakPointer = new PeakPointer(peakFinder, srsHubHandler, autoPositioner, absolutePosition);
-        components.add(peakPointer);
 
 
 //        all links
@@ -198,7 +214,12 @@ public class Setup extends ProgramPart {
         artifactSystem.link(microwaveScoopHandler, slotTracker, launchSystem);
         autoPositioner.link(powerInputMixer, absolutePosition);
 
+        if (scanOnStart) {
+            artifactSystem.scanAll();
+        }
 
-        artifactSystem.scanAll();
+        if(RobotVersion.isAutonomous()){
+            autoPositioner.enableAutoPositioning(true);
+        }
     }
 }
