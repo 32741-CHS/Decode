@@ -11,6 +11,9 @@ public class myConstants {
         public static double intakeRIntakePos = 0.65;
         public static double intakeLoutakePos = 0;
         public static double intakeRoutakePos = 1;
+        public static double intakeLSwitchBallPos = 0.1;
+        public static double intakeRSwitchBallPos = 0.9;
+
     }
     @Config
     public static class Turret{
@@ -27,7 +30,7 @@ public class myConstants {
     @Config
     public static class Spindex{
         public static double KpSpindex = 0.015;
-        public static double KiSpindex = 0.002;
+        public static double KiSpindex = 0;
         public static double KdSpindex =0;
 
     }

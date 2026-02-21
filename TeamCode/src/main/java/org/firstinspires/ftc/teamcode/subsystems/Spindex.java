@@ -22,7 +22,7 @@ public class Spindex {
 
 
     public Spindex(HardwareMap hardwareMap) {
-        encoder = hardwareMap.get(AnalogInput.class, "encoder");
+        encoder = hardwareMap.get(AnalogInput.class, "spindexencoder");
         spindex = hardwareMap.get(DcMotor.class, "spindexer");
         spindex.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         spindex.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -34,11 +34,11 @@ public class Spindex {
     }
 
     public double getPosition(){
-        return encoder.getVoltage() / 3.2 * 360;
+        return (encoder.getVoltage() / 3.2 * 360-33) % 360;
     }
 
     public void goToPosition(double target) {
-        double position = encoder.getVoltage() / 3.2 * 360;
+        double position = (encoder.getVoltage() / 3.2 * 360 -33) % 360;
         double error = target-position;
         while (error > 180)  error -= 360;
         while (error < -180) error += 360;
@@ -61,7 +61,7 @@ public class Spindex {
             double output = (KpSpindex * error) + (KiSpindex * integralSum) + (KdSpindex * derivative);
 
             // Optional but recommended
-            output = Math.max(-0.75, Math.min(0.75, output));
+            output = Math.max(-0.4, Math.min(0.4, output));
 
             spindex.setPower(output);
 

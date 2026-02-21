@@ -49,7 +49,7 @@ public class Turret {
     //aimAngleRed = Math.toDegrees(Math.atan((144 - pos.y) / (144 - pos.x)));
     // turretDeviationNeeded = aimAngleBlue - pos.h;
 
-    public Turret(HardwareMap hardwareMap,  String goalColor, double initAngle){
+    public Turret(HardwareMap hardwareMap,  String goalColor, int x){
         turretMotor = hardwareMap.get(DcMotor.class, "turret");
         flyWheel = hardwareMap.get(DcMotorEx.class, "flyWheel");
         hood = hardwareMap.get(Servo.class, "top");
