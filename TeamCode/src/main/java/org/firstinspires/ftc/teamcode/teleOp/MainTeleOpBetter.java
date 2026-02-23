@@ -216,7 +216,7 @@ public class MainTeleOpBetter extends OpMode {
 
         robot.updateIntake();
         robot.updateTransfer(currentColor, vel, x, y, rotating);
-        if(gamepad2.leftBumperWasPressed()){
+        if(gamepad2.dpadUpWasPressed()){
             robot.toggleNoahMode();
         }
 
