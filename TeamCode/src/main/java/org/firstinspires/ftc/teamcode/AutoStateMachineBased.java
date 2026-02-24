@@ -23,6 +23,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -357,10 +358,11 @@ public class AutoStateMachineBased extends LinearOpMode {
 
                     double[] drumlocations = {SLOT_0.loadPosition,SLOT_1.loadPosition, SLOT_2.loadPosition};
 
+
                     ////.splineToConstantHeading(new Vector2d(drive.localizer.getPose().position.x, ballpickupy * mirrory),Math.toRadians(0))
                     Action pickUpLoadOne = new ParallelAction(
                             drive.actionBuilder(drive.localizer.getPose())
-                                    .strafeTo(new Vector2d(zonetargetx, ballpickupy * mirrory))
+                                    .strafeTo(new Vector2d(zonetargetx, ballpickupy * mirrory),new TranslationalVelConstraint(20))
                                     .build(),
                             new Action() {
                                 Boolean fullyloaded = false;
