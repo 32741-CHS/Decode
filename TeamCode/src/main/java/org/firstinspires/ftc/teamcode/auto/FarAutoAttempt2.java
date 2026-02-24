@@ -42,7 +42,7 @@ public class FarAutoAttempt2 extends OpMode {
     // Actions
     public enum PathState {
         START, TO_SHOOT, SHOOT, INTAKE, PARK,
-        OUT, IN, DETECT
+        OUT, IN, DETECT, ONE_MORE_TIME
     }
     PathState pathState = PathState.START;
 
@@ -65,6 +65,11 @@ public class FarAutoAttempt2 extends OpMode {
     // For Vision
     double x;
     double y;
+    int count3 = 0;
+
+    double xLast;
+    double yLast;
+    Pose currPose;
 
     // Timer Control
     public void resetActionTimer(){ actionTimer.resetTimer(); }
@@ -113,7 +118,6 @@ public class FarAutoAttempt2 extends OpMode {
 
             case INTAKE:
                 if (intake.haveBall()){
-                    //intake.setIntakeSpeed(0.5);
                     timerOnce = true;
                     resetActionTimer();
                     spikeMark += 1;
@@ -135,7 +139,7 @@ public class FarAutoAttempt2 extends OpMode {
                     } else if (spikeMark == 1) {
                         follower.followPath(paths.shootTo2(), 0.9, false);
 
-                        if (follower.atParametricEnd() || waitSecs(2)){
+                        if (follower.atParametricEnd() && waitSecs(2) || waitSecs(2)){
                             spikeMark += 1;
                             resetActionTimer();
                             pathState = PathState.TO_SHOOT;
@@ -157,31 +161,28 @@ public class FarAutoAttempt2 extends OpMode {
 
                 if (count == 0) {
                     double[] results = limelight.updateBall();
-                    x = results[1];
-                    y = results[0];
+                    xLast = results[1];
+                    yLast = results[0];
+                    count += 1;
                 }
 
                 intake.transferOff();
 
                 if(!follower.isBusy()){
                     count += 1;
-                    if (x == 0 && y == 0 || alliance == OLDChoose.Alliance.BLUE) {
+                    if (xLast == 0 && yLast == 0 || alliance == OLDChoose.Alliance.BLUE) {
                         detect = false;
-                        if( spikeMark == 3 ) {
-                            follower.followPath(paths.shootTo3(), 0.9, false);
-                        } else if( spikeMark == 4 ) {
-                            follower.followPath(paths.shootTo4(), 0.9, false);
-                        }
 
-                        if (follower.atParametricEnd() || waitSecs(3)) {
+                        follower.followPath(paths.shootTo4(), 0.9, false);
+
+                        if (waitSecs(1)){
                             resetActionTimer();
                             count = 0;
-                            //pathState = PathState.OUT;
                             pathState = PathState.TO_SHOOT;
                         }
-                    } else if (x != 0 || y != 0){
+                    } else if (xLast != 0 || yLast != 0){
                         if (count2 == 0) {
-                            newY = paths.shootPose2.getY() - y - 5; // 7
+                            newY = paths.shootPose2.getY() - yLast; // 7
 
                             if (newY < 9) {
                                 newY = 9;
@@ -204,7 +205,17 @@ public class FarAutoAttempt2 extends OpMode {
                             follower.followPath(paths.shootTo4(), 0.9, false);
                         } else { follower.followPath(paths. to(ballCollect), 0.9, true); }
 
-                        if (follower.atParametricEnd() || waitSecs(3)) {
+
+//                        if (waitSecs(0.10)) {
+//                            resetActionTimer();
+//                            count = 0;
+//                            count2 = 0;
+//                            detect = true;
+//                            pathState = PathState.ONE_MORE_TIME;
+//                        }
+
+                            //pathState = PathState.ONE_MORE_TIME;
+                        if (follower.atParametricEnd() && waitSecs(1)|| waitSecs(3)) {
                             resetActionTimer();
                             count = 0;
                             count2 = 0;
@@ -215,6 +226,69 @@ public class FarAutoAttempt2 extends OpMode {
                     }
                 }
                 break;
+
+
+            case ONE_MORE_TIME:
+                if (intake.haveBall()){
+                    resetActionTimer();
+                    pathState = PathState.TO_SHOOT;
+                }
+
+                if (count == 0) {
+                    double[] results = limelight.updateBall();
+                    x = results[1];
+                    y = results[0];
+                    count += 1;
+                }
+
+                //intake.transferOff();
+
+                //if(!follower.isBusy()) {
+                    if (xLast != 0 || yLast != 0) {
+                        if (count2 == 0) {
+                            double diffy = Math.abs(yLast - y);
+                            newY = follower.getPose().getY() - y - diffy; // 7
+
+                            if (newY < 9) {
+                                newY = 9;
+                            }
+
+                            ballCollect = new Pose(130, newY, 0);
+                            count2 += 1;
+                            currPose = follower.getPose();
+                        }
+
+                        if(count3 == 0){
+                            if (newY < 12) { // 20
+                                follower.followPath(paths.shootTo4(currPose), 0.9, false);
+                            } else {
+                                follower.followPath(paths.to(currPose, ballCollect), 0.9, true);
+                            }
+                            count3 += 1;
+                        }
+
+
+                        if (follower.atParametricEnd() && waitSecs(1)|| waitSecs(3)) {
+                            count = 0;
+                            count2 = 0;
+                            detect = true;
+                            count3 = 0;
+                            resetActionTimer();
+                            pathState = PathState.TO_SHOOT;
+                        }
+                    } else{
+                        if(follower.atParametricEnd() && waitSecs(1) || waitSecs(3)){
+                            count3 = 0;
+                            count = 0;
+                            count2 = 0;
+                            detect = true;
+                            resetActionTimer();
+                            pathState = PathState.TO_SHOOT;
+                        }
+                    }
+                //}
+                break;
+
 
             case OUT:
                 if (intake.haveBall()){
@@ -313,36 +387,36 @@ public class FarAutoAttempt2 extends OpMode {
                             pathState = PathState.SHOOT;
                         }
                     } else if (spikeMark == 2) {
-                        if(waitSecs(1)) {
+                        if(waitSecs(0.5)) {
                             intake.setIntakeSpeed(0);
-                            shooter.rotateTurret(turnTableAngle);
-                            if (shootCount == 0) {
-                                follower.followPath(paths.collectToShootNotSet(), 0.8, false);
-                                shootCount += 1;
-                            }
+                        }
+                        shooter.rotateTurret(turnTableAngle);
+                        if (shootCount == 0) {
+                            follower.followPath(paths.collectToShootNotSet(), 0.8, false);
+                            shootCount += 1;
+                        }
 
-                            if (follower.atParametricEnd()) {
-                                resetActionTimer();
-                                shootCount = 0;
-                                pathState = PathState.SHOOT;
-                            }
+                        if (follower.atParametricEnd()) {
+                            resetActionTimer();
+                            shootCount = 0;
+                            pathState = PathState.SHOOT;
                         }
                     } else if (spikeMark == 3 || spikeMark == 4 || spikeMark == 5) {
                         shooter.rotateTurret(turnTableAngle);
 
-                        if(waitSecs(1)) {
+                        if(waitSecs(0.5)) {
                             intake.setIntakeSpeed(0);
+                        }
 
-                            if (shootCount == 0) {
-                                follower.followPath(paths.collectToShootNotSet(), 0.8, false);
-                                shootCount += 1;
-                            }
+                        if (shootCount == 0) {
+                            follower.followPath(paths.collectToShootNotSet(), 0.8, false);
+                            shootCount += 1;
+                        }
 
-                            if (follower.atParametricEnd()) {
-                                resetActionTimer();
-                                shootCount = 0;
-                                pathState = PathState.SHOOT;
-                            }
+                        if (follower.atParametricEnd()) {
+                            resetActionTimer();
+                            shootCount = 0;
+                            pathState = PathState.SHOOT;
                         }
                     }
                 }
