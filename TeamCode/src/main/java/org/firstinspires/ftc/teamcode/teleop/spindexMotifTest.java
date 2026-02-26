@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.teleop.spindexMotifTest.ShootModes.
 import static org.firstinspires.ftc.teamcode.teleop.spindexMotifTest.ShootModes.SHOOT;
 import static org.firstinspires.ftc.teamcode.teleop.spindexMotifTest.ShootModes.WAIT_FOR_SHOOT_BUTTON;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -20,7 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Turret;
 
 import java.util.List;
 
-
+@Config
 @TeleOp
 
 public class spindexMotifTest extends OpMode {
@@ -34,6 +35,7 @@ public class spindexMotifTest extends OpMode {
     private Timer pathTimer;
     private double lastLootTime=0;
     private double currentLoopTime;
+    double targetSpindexPosition = 0;
 
     public enum ShootModes {
         //STARTPosition -->EndPosition
@@ -86,11 +88,22 @@ public class spindexMotifTest extends OpMode {
     public void shootSwitchCase() {
         switch (shootModes) {
             case WAIT_FOR_SHOOT_BUTTON:
-                spindex.goToPosition(0);
+                spindex.goToPosition(47.5);
                 intake.intakeBalls();
                 intake.forwardIntakeDirection();
+                if (id == 21) {
+                    targetSpindexPosition =278.75;
+                }
+                if (id == 22) {
+                    targetSpindexPosition=156.25;
+                }
+                if (id == 23) {
+                    targetSpindexPosition =47.5;
+                }
                 if (gamepad1.a) {
                     intake.switchBallOrder();
+                    intake.setIntakePower(0.25);
+
                     pathTimer.resetTimer();
 
                     shootModes = CHANGE_SPINDEX_POSITION;
@@ -100,17 +113,16 @@ public class spindexMotifTest extends OpMode {
             case CHANGE_SPINDEX_POSITION:
 
 
+
+
                 //We are Assuming Balls are in GPP order
-                if (id == 21) {
-                    spindex.goToPosition(10);
-                }
-                if (id == 22) {
-                    spindex.goToPosition(255);
-                }
-                if (id == 23) {
-                    spindex.goToPosition(96);
-                }
-                if (pathTimer.getElapsedTimeSeconds() > 3) {
+
+
+                spindex.goToPosition(targetSpindexPosition);
+
+                if (Math.abs(spindex.getPosition()-targetSpindexPosition) < 5) {
+                    intake.setIntakePower(1);
+                    intake.shootBalls();
                     pathTimer.resetTimer();
                     shootModes = SHOOT;
 
@@ -118,8 +130,10 @@ public class spindexMotifTest extends OpMode {
                 }
                 break;
             case SHOOT:
+
+                intake.setIntakePower(1);
                 turret.setFlyWheelSpeed(-900);
-                intake.shootBalls();
+
                 spindex.setSpindexPower(0.5);
 
                 if (pathTimer.getElapsedTimeSeconds() > 3) {
