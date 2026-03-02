@@ -1,3 +1,7 @@
+# This is in preparation for the next year's season. 
+
+
+
 ## NOTICE
 
 This repository contains the public FTC SDK for the DECODE (2025-2026) competition season.
