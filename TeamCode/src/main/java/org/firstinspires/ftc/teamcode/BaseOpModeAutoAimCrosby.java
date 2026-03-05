@@ -14,20 +14,18 @@ import static org.firstinspires.ftc.teamcode.Util.Enum.States.None;
 import static org.firstinspires.ftc.teamcode.Util.Enum.States.TurnToBall;
 import static org.firstinspires.ftc.teamcode.Util.RobotPosition.TeamColorRED;
 import static org.firstinspires.ftc.teamcode.Util.RobotPosition.getRobotCoordinates;
+import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetx;
+import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyblue;
+import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyred;
 import static org.firstinspires.ftc.teamcode.Util.constants.PART_NAMES.drumslotarray;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinfiringposition;
 import static org.firstinspires.ftc.teamcode.Util.constants.RobotStats.firingpinnullposition;
 import static org.firstinspires.ftc.teamcode.launcher.AutoFirePower.autoLaunch;
 import static org.firstinspires.ftc.teamcode.limelight.LimelightMotifSetting.limelightMotifSet;
 import static org.firstinspires.ftc.teamcode.limelight.LimelightPosSetting.limelightposupdate;
-import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetx;
-import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyblue;
-import static org.firstinspires.ftc.teamcode.Util.constants.FIELD.shoottargetyred;
 import static org.firstinspires.ftc.teamcode.limelight.LimelightPosSetting.roadrunnerupdatevialimelight;
-
 import static java.lang.Math.atan2;
 
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -49,6 +47,7 @@ import org.firstinspires.ftc.teamcode.positioning.odometry.FieldOrientedDriving;
 
 
 public class BaseOpModeAutoAimCrosby extends LinearOpMode {
+
 
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime rapidtime = new ElapsedTime();
@@ -350,6 +349,9 @@ public class BaseOpModeAutoAimCrosby extends LinearOpMode {
             if (autoAimPressed && (autoaimthing.milliseconds() % 500) < 100){
 
                 double[] robotcoordinates = RobotPosition.getRobotCoordinates();
+
+                robotcoordinates[0] = 0;
+                robotcoordinates[1] = 0;
 
                 double arctanintermediatex = shoottargetx-robotcoordinates[0];
                 double arctanintermediatey;
