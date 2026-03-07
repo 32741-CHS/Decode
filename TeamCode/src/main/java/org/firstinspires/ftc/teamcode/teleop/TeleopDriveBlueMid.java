@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.robot.MechState;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.robot.VisionController;
 import org.firstinspires.ftc.vision.VisionPortal;
-@Disabled
 @Configurable
 @TeleOp(name = "TeleopBlueMid", group = "Blue")
 public class TeleopDriveBlueMid extends OpMode {

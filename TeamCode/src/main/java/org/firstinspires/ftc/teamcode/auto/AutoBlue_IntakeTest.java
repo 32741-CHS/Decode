@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.robot.MechState;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.robot.VisionController;
 import org.firstinspires.ftc.vision.VisionPortal;
-@Disabled
 @Autonomous(name = "AutoIntakeTest", group = "Test")
 public class AutoBlue_IntakeTest extends OpMode {
 
