@@ -7,6 +7,7 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.field.Red;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.robot.MechState;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.robot.VisionController;
 import org.firstinspires.ftc.vision.VisionPortal;
-
+@Disabled
 @Autonomous(name = "AutoR_St_Near_En_Mid", group = "Red")
 public class AutoR_St_Near_En_Mid extends OpMode {
 
