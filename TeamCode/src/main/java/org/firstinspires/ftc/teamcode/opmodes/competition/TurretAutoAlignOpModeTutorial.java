@@ -169,7 +169,7 @@ public class TurretAutoAlignOpModeTutorial extends LinearOpMode {
             }
             prevRightTrigger = curRightTrigger;
 
-            // ---------------- OUTTAKE TOGGLE ----------------
+            // ---------------- OUTTAKE TOGGLE -----------------
             boolean curLeftTrigger = gamepad1.left_trigger > 0;
             if (curLeftTrigger && !prevLeftTrigger) {
                 isOuttakeMotorOn = !isOuttakeMotorOn;
