@@ -12,20 +12,18 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.team28420.module.Actions;
 import org.firstinspires.ftc.team28420.module.Camera;
 import org.firstinspires.ftc.team28420.module.Movement;
-import org.firstinspires.ftc.team28420.module.Shooter;
+import org.firstinspires.ftc.team28420.module.shooter.Shooter;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.util.Config;
 
 @TeleOp(name = "BLUE MAIN", group = "New Actions")
 public class BlueTeleOp extends LinearOpMode {
     private boolean dpad_active = false;
+    private Actions act;
+    private boolean dpadPressed = false;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        Config.Etc.telemetry = telemetry;
-
-        Actions act = new Actions(
+    private void initialize() throws InterruptedException {
+        act = new Actions(
                 new Movement(
                         hardwareMap.get(DcMotorEx.class, Config.WheelBaseConf.LEFT_TOP_MOTOR),
                         hardwareMap.get(DcMotorEx.class, Config.WheelBaseConf.RIGHT_TOP_MOTOR),
@@ -37,102 +35,106 @@ public class BlueTeleOp extends LinearOpMode {
                 new Shooter(hardwareMap),
                 hardwareMap.get(Servo.class, "parkingServo")
         );
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        Config.Etc.telemetry = telemetry;
 
         act.init();
+    }
 
+    private void handleTargeting() {
+        if (Config.ShooterConf.TARGET_MOTIF == null) {
+            act.setMotif();
+        }
+
+        telemetry.addData("scanned motif", Config.ShooterConf.TARGET_MOTIF);
+    }
+
+    private void handleMovement() {
+        if (gamepad1.right_trigger > 0.2) {
+            act.move(act.getRatiosForApriltag(AprilTag.BLUE, -2, Config.CameraConf.RANGE_TO_TAG));
+        }
+        else if (gamepad1.right_bumper) {
+            act.move(act.getRatiosLookApriltag(AprilTag.BLUE, 0, Config.CameraConf.RANGE_TO_TAG));
+        }
+        else {
+            manualDrive();
+        }
+    }
+
+    private void manualDrive() {
+        double x = act.getCubic(act.withDeathzone(gamepad1.left_stick_x, Config.GamepadConf.LEFT_DEAD_ZONE));
+        double y = -1 * act.getCubic(act.withDeathzone(gamepad1.left_stick_y, Config.GamepadConf.LEFT_DEAD_ZONE));
+        double rx = act.getCubic(act.withDeathzone(gamepad1.right_stick_x, Config.GamepadConf.RIGHT_DEAD_ZONE));
+
+        act.move(act.getRatios(x, y, rx));
+    }
+
+    private void indicateReady() {
+        gamepad2.setLedColor(0, 255, 0, -1);
+        gamepad2.rumble(0);
+    }
+
+    private void handleShooter() {
+        if (gamepad2.triangle || gamepad2.circle) {
+            if (gamepad2.circle) act.resetRevolverTicks();
+            act.toggleShooterManualControl(false);
+            indicateReady();
+        }
+
+        handleRevolverInput();
+
+        float shooterPower = (float)((gamepad2.right_trigger > 0.4) ? Math.pow(gamepad2.right_trigger, 2) : 0);
+        act.setShooterVelocityCoefficient(shooterPower);
+
+        if (gamepad2.right_bumper) act.shoot();
+    }
+
+    private void rotateRevolver(int degrees) {
+        act.revolverRotate(degrees);
+        gamepad2.setLedColor(255, 0, 0, -1);
+        gamepad2.rumble(-1);
+    }
+
+    private void handleRevolverInput() {
+        if (!dpadPressed) {
+            if (gamepad2.dpad_left) rotateRevolver(-60);
+            if (gamepad2.dpad_right) rotateRevolver(60);
+            if (gamepad2.dpad_up) rotateRevolver(-2);
+            if (gamepad2.dpad_down) rotateRevolver(2);
+        }
+        dpadPressed = (gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up || gamepad2.dpad_down);
+    }
+    private void handleIntakeAndParking() {
+        if (gamepad1.left_bumper) {
+            float power = (gamepad1.left_trigger > 0.5) ? -0.5f : 1.0f;
+            act.setDribblerVelocityCoefficient(power);
+        } else {
+            act.setDribblerVelocityCoefficient(0);
+        }
+
+        if (gamepad1.dpad_up) act.park();
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        initialize();
         waitForStart();
 
         act.afterStart();
-//        act.updateHeading();
         Config.ShooterConf.TARGET_MOTIF = null;
+
         while (opModeIsActive()) {
-            if (Config.ShooterConf.TARGET_MOTIF == null) {
-                act.setMotif();
-            }
-
-            telemetry.addData("scanned motif", Config.ShooterConf.TARGET_MOTIF);
-
-            if (gamepad1.right_trigger > 0.2) {
-//                act.updateHeading();
-                act.move(act.getRatiosForApriltag(AprilTag.BLUE, -2, Config.CameraConf.RANGE_TO_TAG));
-            }
-            else if (gamepad1.right_bumper) {
-                act.move(act.getRatiosLookApriltag(AprilTag.BLUE, 0, Config.CameraConf.RANGE_TO_TAG));
-            }
-            else {
-                act.move(
-                        act.getRatios(
-                                act.getCubic(act.withDeathzone(gamepad1.left_stick_x, Config.GamepadConf.LEFT_DEAD_ZONE)),
-                                -1 * act.getCubic(act.withDeathzone(gamepad1.left_stick_y, Config.GamepadConf.LEFT_DEAD_ZONE)),
-                                act.getCubic(act.withDeathzone(gamepad1.right_stick_x, Config.GamepadConf.RIGHT_DEAD_ZONE))
-                        )
-                );
-            }
-
-            if (gamepad2.triangle) {
-                act.toggleShooterManualControl(false);
-                gamepad2.setLedColor(0, 255, 0, -1);
-                gamepad2.rumble(0);
-            }
-            if(gamepad2.circle) {
-                act.resetRevolverTicks();
-                act.toggleShooterManualControl(false);
-                gamepad2.setLedColor(0, 255, 0, -1);
-                gamepad2.rumble(0);
-            }
-
-            if (gamepad2.dpad_left && !dpad_active) {
-                act.revolverRotate(-60);
-                gamepad2.setLedColor(255, 0, 0, -1);
-                gamepad2.rumble(-1);
-                dpad_active = true;
-            }
-            if (gamepad2.dpad_right && !dpad_active) {
-                act.revolverRotate(60);
-                gamepad2.setLedColor(255, 0, 0, -1);
-                gamepad2.rumble(-1);
-                dpad_active = true;
-            }
-
-            if (gamepad2.dpad_up && !dpad_active) {
-                act.revolverRotate(-2);
-                gamepad2.setLedColor(255, 0, 0, -1);
-                gamepad2.rumble(-1);
-                dpad_active = true;
-            }
-            if (gamepad2.dpad_down && !dpad_active) {
-                act.revolverRotate(2);
-                gamepad2.setLedColor(255, 0, 0, -1);
-                gamepad2.rumble(-1);
-                dpad_active = true;
-            }
-
-
-            if (!gamepad2.dpad_right && !gamepad2.dpad_left) dpad_active = false;
-            if(gamepad1.left_bumper) {
-                if(gamepad1.left_trigger > 0.5) {
-                    act.setDribblerVelocityCoefficient(-0.5f);
-                } else act.setDribblerVelocityCoefficient(1);
-            } else act.setDribblerVelocityCoefficient(0);
-
-            if (gamepad2.right_trigger > 0.4) {
-                act.setShooterVelocityCoefficient(gamepad2.right_trigger * gamepad2.right_trigger);
-            } else act.setShooterVelocityCoefficient(0);
-
-
+            handleTargeting();
+            handleMovement();
+            handleShooter();
+            handleIntakeAndParking();
 
             if (gamepad2.right_bumper){
                 act.shoot();
             }
 
             act.updateShooter();
-
-            if (gamepad1.dpad_up) {
-                act.park();
-            }
-
             act.log();
-
             telemetry.update();
         }
     }

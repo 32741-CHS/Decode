@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.team28420.module.Actions;
 import org.firstinspires.ftc.team28420.module.Camera;
 import org.firstinspires.ftc.team28420.module.Movement;
-import org.firstinspires.ftc.team28420.module.Shooter;
+import org.firstinspires.ftc.team28420.module.shooter.Shooter;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.util.Config;
 

@@ -16,8 +16,8 @@ import org.firstinspires.ftc.team28420.module.shooter.Shooter;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.util.Config;
 
-@TeleOp(name = "RED MAIN", group = "New Actions")
-public class RedTeleOp extends LinearOpMode {
+@TeleOp(name = "Shooter test", group = "New Actions")
+public class ShooterSpeedTest extends LinearOpMode {
     private boolean dpad_active = false;
 
     @Override
@@ -54,10 +54,10 @@ public class RedTeleOp extends LinearOpMode {
 
             if (gamepad1.right_trigger > 0.2) {
 //                act.updateHeading();
-                act.move(act.getRatiosForApriltag(AprilTag.RED, 2, Config.CameraConf.RANGE_TO_TAG));
+                act.move(act.getRatiosForApriltag(AprilTag.BLUE, -2, Config.CameraConf.RANGE_TO_TAG));
             }
             else if (gamepad1.right_bumper) {
-                act.move(act.getRatiosLookApriltag(AprilTag.RED, 0, Config.CameraConf.RANGE_TO_TAG));
+                act.move(act.getRatiosLookApriltag(AprilTag.BLUE, 0, Config.CameraConf.RANGE_TO_TAG));
             }
             else {
                 act.move(
@@ -107,18 +107,19 @@ public class RedTeleOp extends LinearOpMode {
                 dpad_active = true;
             }
 
-            if (!gamepad2.dpad_right && !gamepad2.dpad_left) dpad_active = false;
 
+            if (!gamepad2.dpad_right && !gamepad2.dpad_left) dpad_active = false;
             if(gamepad1.left_bumper) {
                 if(gamepad1.left_trigger > 0.5) {
                     act.setDribblerVelocityCoefficient(-0.5f);
                 } else act.setDribblerVelocityCoefficient(1);
             } else act.setDribblerVelocityCoefficient(0);
 
-
             if (gamepad2.right_trigger > 0.4) {
                 act.setShooterVelocityCoefficient(gamepad2.right_trigger * gamepad2.right_trigger);
             } else act.setShooterVelocityCoefficient(0);
+
+
 
             if (gamepad2.right_bumper){
                 act.shoot();

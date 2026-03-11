@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.team28420.module;
+package org.firstinspires.ftc.team28420.module.shooter;
 
 import android.graphics.Color;
 
@@ -24,11 +24,9 @@ import java.util.HashMap;
 
 public class Shooter {
     private final DcMotorEx left, right, revolver;
-    private final Servo pusher;
     private final ColorSensor cs;
     private final BallDetection.BallColor color = null;
     private final ElapsedTime shooterTime = new ElapsedTime();
-    private final DcMotorEx dribbler;
     private HashMap<String, Integer> sortSeqMap = null;
     private int globalTarget = 0;
     private ShooterState state = ShooterState.IDLE;
@@ -37,30 +35,35 @@ public class Shooter {
     private boolean ballPresent = false;
     private final ElapsedTime debounceTimer = new ElapsedTime();
     private boolean potentialBallDetected = false;
-
+    private final Dribbler dribbler;
+    private final Pusher pusher;
     public String curMotif = "";
 
+
     public Shooter(HardwareMap hMap) {
-        sortSeqMap = new HashMap<String, Integer>();
-        sortSeqMap.put("PPG", 0);
-        sortSeqMap.put("GPP", 1);
-        sortSeqMap.put("PGP", 2);
+        initSortSeq();
 
         this.left = hMap.get(DcMotorEx.class, "shLeft");
         this.right = hMap.get(DcMotorEx.class, "shRight");
         this.revolver = hMap.get(DcMotorEx.class, "sort");
         this.cs = hMap.get(ColorSensor.class, "colorSensor");
-        this.pusher = hMap.get(Servo.class, "pusher");
-        dribbler = hMap.get(DcMotorEx.class, "dribbler");
-    }
 
+        pusher = new Pusher(hMap);
+        dribbler = new Dribbler(hMap);
+    }
+    public void initSortSeq() {
+        sortSeqMap = new HashMap<String, Integer>();
+        sortSeqMap.put("PPG", 0);
+        sortSeqMap.put("GPP", 1);
+        sortSeqMap.put("PGP", 2);
+    }
     public void setup() {
         right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         setMotorsMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        pusher.setPosition(Config.ShooterConf.PUSH_NEUTRAL);
+        pusher.setState(Pusher.PusherState.INIT);
         revolver.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(10, 0, 0, 0));
         left.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(10, 0, 0, 0));
         right.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(10, 0, 0, 0));
@@ -69,7 +72,7 @@ public class Shooter {
     }
     public void afterStart() {
         syncTicks();
-        pusher.setPosition(0.3);
+        pusher.setState(Pusher.PusherState.NEUTRAL);
     }
     public void toggleManualControl(boolean active) {
         if(state == ShooterState.IDLE) {
@@ -85,7 +88,7 @@ public class Shooter {
     }
 
     public void setDribblerVelocityCoefficient(float k) {
-        dribbler.setVelocity(Config.ShooterConf.DRIBBLER_VELOCITY * k);
+        dribbler.setVelocityCoefficient(k);
     }
 
     public void setMotorsMode(DcMotor.RunMode mode) {
@@ -108,6 +111,9 @@ public class Shooter {
         telemetry.addData("MOTIF", curMotif);
         telemetry.addData("CORRECT MOTIF", correctMotif);
         telemetry.addData("SHOOTING ALLOWED", isShootable());
+        telemetry.addData("CURRENT VELOCITY LEFT", left.getVelocity());
+        telemetry.addData("CURRENT VELOCITY RIGHT", right.getVelocity());
+        telemetry.addData("CURRENT POSITION RIGHT", right.getCurrentPosition());
     }
 
     public void snapToNearestSlot() {
@@ -270,9 +276,9 @@ public class Shooter {
 
     public void pushBall(boolean push) {
         if (push) {
-            pusher.setPosition(0.05);
+            pusher.setState(Pusher.PusherState.PUSH);
         } else {
-            pusher.setPosition(0.3);
+            pusher.setState(Pusher.PusherState.NEUTRAL);
         }
     }
 
