@@ -13,5 +13,8 @@ dependencies {
     implementation 'org.firstinspires.ftc:FtcCommon:11.0.0'
     implementation 'org.firstinspires.ftc:Vision:11.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
+    
+    // FTCLib dependencies as per instructions
+    implementation 'org.ftclib.ftclib:core:2.1.1'
+    implementation 'org.ftclib.ftclib:vision:2.1.0'
 }
-

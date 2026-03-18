@@ -4,62 +4,80 @@ import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Tools.LimelightController;
 
-@TeleOp(name = "Test 2026 PID Heading", group = "Test")
+@TeleOp(name = "Riley Is tuff, Ryan C Is BUNS", group = "Test")
 public class Test2026 extends LinearOpMode {
     
     // Core components
     private final ElapsedTime runtime = new ElapsedTime();
     private MecanumDrive drive;
     private GamepadEx driveGamepad1;
-    private IMU imu;
+    private LimelightController limelightController;
 
     private PIDController headingPID;
     private double targetHeading = 0;
+
+    // Use MotorEx to access encoders
+    private MotorEx frontLeft, frontRight, backLeft, backRight;
 
     private static final double Kp = 0.015;
     private static final double Ki = 0.0;
     private static final double Kd = 0.001;
 
+    // Robot physical constants for encoder-based heading
+    private static final double TRACK_WIDTH = 16.3; // Distance between left and right wheels in inches
+    private static final double WHEEL_DIAMETER = 4.0;
+    private static final double TICKS_PER_REV = 537.7;
+    private static final double TICKS_PER_INCH = TICKS_PER_REV / (WHEEL_DIAMETER * Math.PI);
+
     public void initialize() {
-        // Initialize motors using MotorEx for FTCLib compatibility
-        MotorEx frontLeft = new MotorEx(hardwareMap, "frontleft");
-        MotorEx frontRight = new MotorEx(hardwareMap, "frontright");
-        MotorEx backLeft = new MotorEx(hardwareMap, "backleft");
-        MotorEx backRight = new MotorEx(hardwareMap, "backright");
+        // Initialize motors using MotorEx
+        frontLeft = new MotorEx(hardwareMap, "front_left");
+        frontRight = new MotorEx(hardwareMap, "front_right");
+        backLeft = new MotorEx(hardwareMap, "back_left");
+        backRight = new MotorEx(hardwareMap, "back_right");
         
+        // Reset encoders
+        frontLeft.resetEncoder();
+        frontRight.resetEncoder();
+        backLeft.resetEncoder();
+        backRight.resetEncoder();
+
         // Initialize the drive base
         drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
         
         // Initialize Gamepad wrapper
         driveGamepad1 = new GamepadEx(gamepad1);
         
-        // Initialize IMU with robot orientation
-        imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot orientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-        );
-        imu.initialize(new IMU.Parameters(orientation));
-        
         // Initialize PID Controller
         headingPID = new PIDController(Kp, Ki, Kd);
-        headingPID.setTolerance(1.5); // Degree tolerance
+        headingPID.setTolerance(1.5); 
+
+        // Initialize Limelight
+        limelightController = new LimelightController(hardwareMap, telemetry);
         
-        telemetry.addData("Status", "Hardware Initialized");
+        telemetry.addData("Status", "Hardware Initialized (Encoder Heading)");
     }
+
+    /**
+     * Estimates heading using wheel encoders.
+     * Heading = (RightDistance - LeftDistance) / TrackWidth
+     */
     private double getHeading() {
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        return orientation.getYaw(AngleUnit.DEGREES);
+        // MotorEx.getDistance() uses the distance per pulse if set, 
+        // otherwise we manually calculate it from ticks.
+        double leftDist = (frontLeft.getCurrentPosition() + backLeft.getCurrentPosition()) / (2.0 * TICKS_PER_INCH);
+        double rightDist = (frontRight.getCurrentPosition() + backRight.getCurrentPosition()) / (2.0 * TICKS_PER_INCH);
+        
+        // Calculate heading in radians then convert to degrees
+        double headingRad = (rightDist - leftDist) / TRACK_WIDTH;
+        return Math.toDegrees(headingRad);
     }
 
     @Override
@@ -74,7 +92,6 @@ public class Test2026 extends LinearOpMode {
         targetHeading = getHeading();
 
         while (opModeIsActive()) {
-            // Safety: Stop robot if match time expires (standard 2 mins)
             if (runtime.milliseconds() > 119000) {
                 drive.stop();
                 break;
@@ -82,9 +99,13 @@ public class Test2026 extends LinearOpMode {
 
             double currentHeading = getHeading();
 
-            // Press A to reset the target heading to your current orientation
+            // Press A to reset the target heading and encoders
             if (gamepad1.a) {
-                targetHeading = currentHeading;
+                frontLeft.resetEncoder();
+                frontRight.resetEncoder();
+                backLeft.resetEncoder();
+                backRight.resetEncoder();
+                targetHeading = 0;
                 headingPID.reset();
             }
 
@@ -94,23 +115,29 @@ public class Test2026 extends LinearOpMode {
             while (error <= -180) error += 360;
 
             // PID calculates turn correction based on wrapped error
-            // We pass 0 as current because we already calculated the wrapped error
             double turnCorrection = headingPID.calculate(-error, 0);
             turnCorrection = Range.clip(turnCorrection, -0.5, 0.5);
 
-            // Drive control
-            double driveSpeed = 0.8;
-            drive.driveRobotCentric(
-                    -driveGamepad1.getLeftX() * driveSpeed,
-                    -driveGamepad1.getLeftY() * driveSpeed,
-                    turnCorrection // PID handles the rotation
-            );
+            // Limelight Tracking: ID 24 (or whatever is in range)
+            // You can change 19 to the ID you see in telemetry
+            boolean tracking = limelightController.track(20, drive);
 
-            // Telemetry output for debugging and tuning
-            telemetry.addData("Heading", "Target: %.1f, Current: %.1f", targetHeading, currentHeading);
-            telemetry.addData("Correction", "Error: %.1f, Power: %.2f", error, turnCorrection);
-            telemetry.addData("Runtime", "%.1f seconds", runtime.seconds());
+            if (!tracking) {
+                drive.driveRobotCentric(
+                        -driveGamepad1.getLeftX(),
+                        -driveGamepad1.getLeftY(),
+                        -turnCorrection 
+                );
+            }
+
+            // Telemetry output
+            telemetry.addData("Visible IDs", limelightController.getVisibleIDs());
+            telemetry.addData("Encoder Heading", "%.1f deg", currentHeading);
+            telemetry.addData("Target Heading", "%.1f deg", targetHeading);
+            telemetry.addData("Correction", "%.2f", turnCorrection);
+            telemetry.addData("Limelight Tracking", tracking);
             telemetry.update();
         }
+        limelightController.stop();
     }
 }
