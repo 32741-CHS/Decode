@@ -23,9 +23,9 @@ DcMotorEx bread_motor;
 
         telemetry.addData("number", wise_tree);
 
-        if(gamepad1.a)
-        bread_motor.setPower(wise_tree);
-
+        if(gamepad1.a) {
+            bread_motor.setPower(wise_tree);
+        }
     }
 
 }
