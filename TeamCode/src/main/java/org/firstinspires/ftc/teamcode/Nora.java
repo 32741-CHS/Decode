@@ -14,7 +14,7 @@ public class Nora extends OpMode {
     @Override
     public void loop() {
 
-        int nora = 9;
+        int nora = 8;
         int shay = 12;
         int seamus = shay + nora;
 
