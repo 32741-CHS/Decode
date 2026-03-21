@@ -23,6 +23,9 @@ public class Nora extends OpMode {
 
         if (gamepad1.a) {
             motor.setPower(seamus);
+        } else {
+            motor.setPower(0);
+
         }
     }
 }
