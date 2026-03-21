@@ -25,6 +25,6 @@ public class proctor extends OpMode {
 
         telemetry.addData("Number",pop_corn);
 
-        pen.setPower(pop_corn/65);
+        pen.setPower(pop_corn/6500);
     }
 }
