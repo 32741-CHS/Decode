@@ -21,12 +21,11 @@ public class Nora extends OpMode {
 
         telemetry.addData("Number", seamus);
 
+        if (gamepad1.a) {
+            motor.setPower(seamus);
+        } else {
+            motor.setPower(0);
 
-
-
-
-
-        if (gamepad1.a){
-        motor.setPower(seamus);
+        }
     }
 }
