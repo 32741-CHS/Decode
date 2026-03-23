@@ -1,17 +1,19 @@
 package org.firstinspires.ftc.team28420.module.shooter;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class Pusher {
     public enum PusherState {
         INIT,
         PUSH,
         NEUTRAL
     }
-    private final double INITPOS = 0.3;
-    private final double PUSHPOS = 0.05;
-    private final double NEUTRALPOS = 0.3;
+    public static double INITPOS = 0.3;
+    public static double PUSHPOS = 0.7;
+    public static double NEUTRALPOS = 1;
     private final Servo pusher;
     private PusherState state = PusherState.INIT;
 

@@ -54,7 +54,7 @@ public class BlueAutonomous extends LinearOpMode {
 
 
             if (elapsedTime.milliseconds() >= 10000 && elapsedTime.milliseconds() <= 12000) {
-                act.setShooterVelocityCoefficient(1);
+                act.prepareForShoot(1);
                 telemetry.addLine("4");
             } else if (elapsedTime.milliseconds() >= 12000 && !shootingDone) {
                 telemetry.addLine("5");
@@ -65,7 +65,7 @@ public class BlueAutonomous extends LinearOpMode {
                 }
                 if (counter > 3) {
                     shootingDone = true;
-                    act.setShooterVelocityCoefficient(0);
+                    act.prepareForShoot(0);
                 }
             }
             telemetry.addData("counter", counter);

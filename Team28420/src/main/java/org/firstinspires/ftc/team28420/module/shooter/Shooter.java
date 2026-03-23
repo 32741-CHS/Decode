@@ -62,15 +62,15 @@ public class Shooter {
     }
 
     public void setup() {
-        right.setDirection(DcMotorSimple.Direction.REVERSE);
+        left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         setMotorsMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMotorsMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        pusher.setState(Pusher.PusherState.INIT);
+        pusher.setState(Pusher.PusherState.NEUTRAL);
         revolver.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(10, 0, 0, 0));
-        left.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(10, 0, 0, 0));
-        right.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(10, 0, 0, 0));
+        left.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(ShooterConf.SHOOTER_P, ShooterConf.SHOOTER_I, 0, ShooterConf.SHOOTER_F));
+        right.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(ShooterConf.SHOOTER_P, ShooterConf.SHOOTER_I, 0, ShooterConf.SHOOTER_F));
 
         setMotorsZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
@@ -82,9 +82,6 @@ public class Shooter {
 
     public void toggleManualControl(boolean active) {
         if (state == ShooterState.IDLE) {
-            if (!active && manualControl) {
-                snapToNearestSlot();
-            }
             if (active != manualControl) {
                 manualControl = active;
                 correctMotif = false;
@@ -112,6 +109,10 @@ public class Shooter {
         globalTarget = revolver.getCurrentPosition();
     }
 
+    private double toRPM(double tps) {
+        return tps * 60.0 / 28.0;
+    }
+
     public void log(Telemetry telemetry) {
         telemetry.addData("ANGLE", currentAngle());
         telemetry.addData("MOTIF", curMotif);
@@ -119,7 +120,8 @@ public class Shooter {
         telemetry.addData("SHOOTING ALLOWED", isShootable());
         telemetry.addData("CURRENT VELOCITY LEFT", left.getVelocity());
         telemetry.addData("CURRENT VELOCITY RIGHT", right.getVelocity());
-        telemetry.addData("CURRENT POSITION RIGHT", right.getCurrentPosition());
+        telemetry.addData("CURRENT RPM LEFT", toRPM(left.getVelocity()));
+        telemetry.addData("CURRENT RPM RIGHT", toRPM(right.getVelocity()));
     }
 
     public void snapToNearestSlot() {
@@ -212,7 +214,6 @@ public class Shooter {
     }
 
     public boolean alignRevolverToTarget() {
-        rotateRevolver(60);
         if (ShooterConf.TARGET_MOTIF == null || ShooterConf.TARGET_MOTIF.isEmpty()) return false;
 
         int currentIndex = sortSeqMap.getOrDefault(curMotif, 0);
@@ -264,14 +265,7 @@ public class Shooter {
     }
 
     public boolean isShootable() {
-        double currentAngle = currentAngle() % 360;
-        if (currentAngle < 0) currentAngle += 360;
-
-        boolean nearSlot1 = Math.abs(currentAngle - 60) < 5;
-        boolean nearSlot2 = Math.abs(currentAngle - 180) < 5;
-        boolean nearSlot3 = Math.abs(currentAngle - 300) < 5;
-
-        return (nearSlot1 || nearSlot2 || nearSlot3) && !revolver.isBusy();
+        return !revolver.isBusy();
     }
 
     public void sortedNextBall() {
@@ -280,8 +274,6 @@ public class Shooter {
                 curMotif = curMotif.substring(0, curMotif.length() - 1);
                 if (curMotif.length() > 0) rotateRevolver(-120);
                 else {
-                    // калі матываў няма
-                    rotateRevolver(-60);
                     correctMotif = false;
                 }
             }
@@ -307,35 +299,18 @@ public class Shooter {
 
     public boolean shoot() {
         if (state == Shooter.ShooterState.IDLE && isShootable()) {
-            pushBall(true);
-            state = ShooterState.SHOOTING;
-            shooterTime.reset();
+            state = ShooterState.REVOLVER_TURNING;
+            if(manualControl) {
+                rotateRevolver(120);
+            } else rotateRevolver(360);
+
             return true;
         }
         return false;
     }
 
-    public void update(boolean scanAllowed) {
+    public void update() {
         switch (state) {
-            case SHOOTING:
-                if (shooterTime.milliseconds() >= 600) {
-                    pushBall(false);
-                    state = Shooter.ShooterState.STOP_SHOOTING;
-                    shooterTime.reset();
-                }
-                break;
-            case STOP_SHOOTING:
-                if (shooterTime.milliseconds() >= 600) {
-                    if (manualControl) {
-                        // если ручной режим, то после выстрела не поворачиваем барабан
-                        state = Shooter.ShooterState.IDLE;
-                    } else {
-                        sortedNextBall();
-                        state = Shooter.ShooterState.REVOLVER_TURNING;
-                        shooterTime.reset();
-                    }
-                }
-                break;
             case REVOLVER_TURNING:
                 if (!revolver.isBusy()) {
                     state = Shooter.ShooterState.IDLE;
@@ -344,10 +319,10 @@ public class Shooter {
                 break;
 
             case IDLE:
-                if (!isShootable() && !manualControl && !isMotifFull() && scanAllowed) scanBall();
+                if (!isShootable() && !manualControl && !isMotifFull()) scanBall();
                 break;
         }
     }
 
-    public enum ShooterState {IDLE, SHOOTING, STOP_SHOOTING, REVOLVER_TURNING}
+    public enum ShooterState {IDLE, REVOLVER_TURNING}
 }

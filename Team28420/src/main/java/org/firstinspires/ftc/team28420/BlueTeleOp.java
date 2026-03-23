@@ -64,7 +64,7 @@ public class BlueTeleOp extends LinearOpMode {
         handleRevolverInput();
 
         float shooterPower = (float) ((gamepad2.right_trigger > 0.4) ? Math.pow(gamepad2.right_trigger, 2) : 0);
-        act.setShooterVelocityCoefficient(shooterPower);
+        act.prepareForShoot(shooterPower);
 
         if (gamepad2.right_bumper) act.shoot();
     }

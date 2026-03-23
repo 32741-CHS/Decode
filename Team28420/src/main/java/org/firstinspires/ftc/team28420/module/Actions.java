@@ -25,8 +25,6 @@ public class Actions {
     private final Parking parking;
     private final Telemetry telemetry;
 
-    public boolean scanAllowed = true;
-
     public Actions(HardwareMap hMap, Telemetry telemetry) throws InterruptedException {
         this.mv = new Movement(hMap);
         this.imu = hMap.get(IMU.class, GyroConf.IMU);
@@ -47,7 +45,7 @@ public class Actions {
     }
 
     public void updateShooter() {
-        shooter.update(scanAllowed);
+        shooter.update();
     }
 
     public void toggleShooterManualControl(boolean active) {
@@ -58,8 +56,9 @@ public class Actions {
         shooter.setDribblerVelocityCoefficient(k);
     }
 
-    public void setShooterVelocityCoefficient(float k) {
+    public void prepareForShoot(float k) {
         shooter.setVelocityCoefficient(k);
+        shooter.pushBall(k != 0);
     }
 
     public void afterStart() {
