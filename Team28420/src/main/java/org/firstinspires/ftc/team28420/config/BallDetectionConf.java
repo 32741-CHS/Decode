@@ -11,5 +11,5 @@ public class BallDetectionConf {
     public static Scalar lowPurple = new Scalar(125, 50, 50);
     public static Scalar highPurple = new Scalar(160, 255, 255);
     public static double MIN_AREA = 15000; // минимальный размер объекта
-    public static double kP = 0.0025;
+    public static double kP = 0.0019;
 }

@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.team28420.config.BallDetectionConf;
 import org.firstinspires.ftc.team28420.config.CameraConf;
 import org.firstinspires.ftc.team28420.config.GamepadConf;
@@ -36,11 +37,13 @@ public class BallDetectionTeleOp extends LinearOpMode {
     private void handleMovement() {
         if (gamepad1.circle) {
             act.setDribblerVelocityCoefficient(1.0f);
-            act.setHelperWheelCoefficient(0.5f);
+            act.camPeek();
             act.aimAndDriveToBall();
         } else if (gamepad1.right_trigger > 0.2) {
-            act.move(act.getRatiosForApriltag(AprilTag.BLUE, -2, CameraConf.RANGE_TO_TAG));
+            act.camIdle();
+            act.move(act.getRatiosForApriltag(AprilTag.BLUE, 0.07, CameraConf.RANGE_TO_TAG));
         } else if (gamepad1.right_bumper) {
+            act.camIdle();
             act.move(act.getRatiosLookApriltag(AprilTag.BLUE, 0, CameraConf.RANGE_TO_TAG));
         } else {
             manualDrive();
@@ -55,7 +58,8 @@ public class BallDetectionTeleOp extends LinearOpMode {
             act.brake();
         } else {
             WheelsRatio<Double> ratios = act.getRatios(new MovementParams(
-                    new PolarVector(new Position(x, y)), rx));
+                    new PolarVector(new Position(x, y)).rotate(-act.getRobotAngles().getYaw(AngleUnit.RADIANS)),
+                    rx));
             act.move(ratios);
         }
     }
@@ -72,7 +76,7 @@ public class BallDetectionTeleOp extends LinearOpMode {
         handleRevolverInput();
 
         float shooterPower = (float) ((gamepad2.right_trigger > 0.4) ? Math.pow(gamepad2.right_trigger, 2) : 0);
-        shooterPower *= gamepad2.left_bumper ? 1.3f : 1;
+        shooterPower *= gamepad2.left_bumper ? 1.42 : 1;
 
         act.prepareForShoot(shooterPower);
         if (gamepad2.right_bumper) act.shoot();
@@ -104,6 +108,7 @@ public class BallDetectionTeleOp extends LinearOpMode {
         }
         if (gamepad1.dpad_up) act.park();
     }
+
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
@@ -111,11 +116,6 @@ public class BallDetectionTeleOp extends LinearOpMode {
         act.afterStart();
         ShooterConf.TARGET_MOTIF = null;
         while (opModeIsActive()) {
-            // TODO: delete later (only for calibration)
-            if(gamepad2.cross) {
-                act.setShooterPids();
-            }
-
             act.updateLastAngles();
             act.updateApriltags();
             handleTargeting();

@@ -98,5 +98,9 @@ public class BallDetection implements VisionProcessor {
 
     public BallColor getDetectedColor() { return detectedColor; }
     public Point getBallPosition() { return ballPosition; }
+    public double getBallArea() {
+        if(ballPosition != null) return maxArea;
+        return Double.NaN;
+    }
     public enum BallColor {GREEN, PURPLE, NONE}
 }

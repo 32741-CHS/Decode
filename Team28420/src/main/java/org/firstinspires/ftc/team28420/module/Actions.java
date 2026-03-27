@@ -3,12 +3,14 @@ package org.firstinspires.ftc.team28420.module;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.team28420.config.BallDetectionConf;
 import org.firstinspires.ftc.team28420.config.CameraConf;
+import org.firstinspires.ftc.team28420.config.CameraServoConf;
 import org.firstinspires.ftc.team28420.config.GyroConf;
 import org.firstinspires.ftc.team28420.config.ShooterConf;
 import org.firstinspires.ftc.team28420.config.WheelBaseConf;
@@ -21,11 +23,15 @@ import org.firstinspires.ftc.team28420.types.WheelsRatio;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.opencv.core.Point;
 
+import java.nio.charset.CharacterCodingException;
+
 public class Actions {
 
     private final Movement mv;
     private final IMU imu;
     private final Camera cam;
+
+    private final Servo cameraServo;
     private final Shooter shooter;
     private final Parking parking;
     private BallDetection ballDetection;
@@ -39,6 +45,7 @@ public class Actions {
         this.ballDetection = new BallDetection();
         this.cam = new Camera(hMap, ballDetection);
         this.shooter = new Shooter(hMap, telemetry);
+        this.cameraServo = hMap.get(Servo.class, "cameraServo");
         this.parking = new Parking(hMap);
         this.telemetry = telemetry;
 
@@ -50,6 +57,13 @@ public class Actions {
         shooter.setup();
         parking.setup();
         imu.resetYaw();
+        camIdle();
+    }
+    public void camPeek() {
+        cameraServo.setPosition(CameraServoConf.PEEK_POS);
+    }
+    public void camIdle() {
+        cameraServo.setPosition(CameraServoConf.IDLE_POS);
     }
 
     public void brake() {
@@ -74,7 +88,6 @@ public class Actions {
 
     public void prepareForShoot(float k) {
         shooter.setVelocityCoefficient(k);
-        shooter.pushBall(k != 0);
     }
 
     public void afterStart() {
@@ -183,10 +196,10 @@ public class Actions {
 
         if (ballPos != null) {
             double errorX = ballPos.x - CameraConf.WIDTH/2.0;
-            double rx = -errorX * BallDetectionConf.kP;
-            move(getRatios(Math.PI / 2, 0.25, rx));
+            double rx = errorX * BallDetectionConf.kP;
+            move(getRatios(Math.PI / 2, 0.067, rx));
         } else {
-            move(getRatios(Math.PI / 2, 0.25, 0));
+            move(getRatios(Math.PI / 2, 0.08, 0));
         }
     }
 }

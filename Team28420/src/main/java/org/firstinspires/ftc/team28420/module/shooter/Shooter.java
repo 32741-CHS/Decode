@@ -210,7 +210,7 @@ public class Shooter {
     public void setMotorsZeroPowerBehavior(DcMotor.ZeroPowerBehavior behavior) {
         left.setZeroPowerBehavior(behavior);
         right.setZeroPowerBehavior(behavior);
-        revolver.setZeroPowerBehavior(behavior);
+        //revolver.setZeroPowerBehavior(behavior);
     }
 
     private void syncTicks() {
@@ -301,13 +301,18 @@ public class Shooter {
     }
 
     public boolean alignRevolverToTarget() {
-        rotateRevolver(60);
         if (ShooterConf.TARGET_MOTIF == null || ShooterConf.TARGET_MOTIF.isEmpty()) return false;
 
+        // Default offset is 60 degrees
+        double finalRotationDeg = 60;
         int moveSlots = sorter.getMoveSlots();
 
-        if (moveSlots == 1) rotateRevolver(120);
-        if (moveSlots == 2) rotateRevolver(-120);
+        // Add the extra rotation based on the required slots
+        if (moveSlots == 1) finalRotationDeg += 120;
+        if (moveSlots == 2) finalRotationDeg -= 120; // 60 - 120 = -60 degrees
+
+        // Send ONE single command so the motor uses a single PID curve
+        rotateRevolver(finalRotationDeg);
 
         sorter.setCurMotif(ShooterConf.TARGET_MOTIF);
         return true;
@@ -357,9 +362,8 @@ public class Shooter {
         boolean nearSlot2 = Math.abs(currentAngle - 180) < 5;
         boolean nearSlot3 = Math.abs(currentAngle - 300) < 5;
 
-        boolean flywheelReady = Math.abs(left.getVelocity() - ShooterConf.VELOCITY) < 240 && Math.abs(right.getVelocity() - ShooterConf.VELOCITY) < 240;
-
-        return (nearSlot1 || nearSlot2 || nearSlot3) && !revolver.isBusy() && flywheelReady;
+        boolean isNearSlot =  (nearSlot1 || nearSlot2 || nearSlot3);
+        return isNearSlot;
     }
     public void pushBall(boolean push) {
         if (push) {

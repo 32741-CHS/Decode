@@ -76,7 +76,8 @@ public class Camera {
 
     private PolarVector getVectorToPoint(double x, double y, double x0, double y0) {
         double theta = Math.atan2(y - y0, x - x0);
-        double abs = Math.hypot(x - x0, y - y0) / 35;
+        double abs = Math.hypot(x - x0, y - y0) / 2;
+
         return new PolarVector(theta, Math.min(abs, 1.0));
     }
 
