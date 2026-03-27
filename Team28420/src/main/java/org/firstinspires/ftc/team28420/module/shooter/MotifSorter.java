@@ -26,6 +26,9 @@ public class MotifSorter {
     public void appendBallToMotif(char color) {
         curMotif += color;
     }
+    public void dropLastBall() {
+        curMotif = curMotif.substring(0, curMotif.length() - 1);
+    }
 
     public void setCurMotif(String motif) {
         curMotif = motif;

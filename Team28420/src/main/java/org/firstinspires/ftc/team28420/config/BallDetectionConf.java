@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.team28420.config;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.opencv.core.Scalar;
 
+@Config
 public class BallDetectionConf {
-    public static Scalar lowGreen = new Scalar(100, 150, 50);
-    public static Scalar highGreen = new Scalar(130, 255, 255);
-    public static Scalar lowPurple = new Scalar(130, 40, 40);
+    public static Scalar lowGreen = new Scalar(35, 50, 50);
+    public static Scalar highGreen = new Scalar(85, 255, 255);
+    public static Scalar lowPurple = new Scalar(125, 50, 50);
     public static Scalar highPurple = new Scalar(160, 255, 255);
-
-    public static double MIN_CIRCULARITY = 0.5; // насколько объект должен быть круглым (0.0 - 1.0)
-    public static double MIN_AREA = 60000; // минимальный размер объекта
-    public static double MAX_AREA = 120000;
-    public static double kP = 0.01;
+    public static double MIN_AREA = 15000; // минимальный размер объекта
+    public static double kP = 0.0025;
 }

@@ -7,18 +7,19 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.team28420.config.BallDetectionConf;
+import org.firstinspires.ftc.team28420.config.CameraConf;
 import org.firstinspires.ftc.team28420.config.GyroConf;
 import org.firstinspires.ftc.team28420.config.ShooterConf;
 import org.firstinspires.ftc.team28420.config.WheelBaseConf;
 import org.firstinspires.ftc.team28420.module.shooter.Shooter;
+import org.firstinspires.ftc.team28420.processors.BallDetection;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.types.MovementParams;
 import org.firstinspires.ftc.team28420.types.PolarVector;
 import org.firstinspires.ftc.team28420.types.WheelsRatio;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.opencv.core.Point;
 
 public class Actions {
 
@@ -27,7 +28,7 @@ public class Actions {
     private final Camera cam;
     private final Shooter shooter;
     private final Parking parking;
-    private final Turret turret;
+    private BallDetection ballDetection;
     private final Telemetry telemetry;
 
     private YawPitchRollAngles lastAngles = new YawPitchRollAngles(AngleUnit.RADIANS, 0, 0, 0, 0);
@@ -35,11 +36,12 @@ public class Actions {
     public Actions(HardwareMap hMap, Telemetry telemetry) throws InterruptedException {
         this.mv = new Movement(hMap);
         this.imu = hMap.get(IMU.class, GyroConf.IMU);
-        this.cam = new Camera(hMap);
+        this.ballDetection = new BallDetection();
+        this.cam = new Camera(hMap, ballDetection);
         this.shooter = new Shooter(hMap, telemetry);
         this.parking = new Parking(hMap);
-        this.turret = new Turret(hMap);
         this.telemetry = telemetry;
+
     }
 
     public void init() {
@@ -48,6 +50,10 @@ public class Actions {
         shooter.setup();
         parking.setup();
         imu.resetYaw();
+    }
+
+    public void brake() {
+        mv.brake();
     }
 
     public void updateShooter() {
@@ -60,6 +66,10 @@ public class Actions {
 
     public void setDribblerVelocityCoefficient(float k) {
         shooter.setDribblerVelocityCoefficient(k);
+    }
+
+    public void setHelperWheelCoefficient(float k) {
+        shooter.setHelperWheelCoefficient(k);
     }
 
     public void prepareForShoot(float k) {
@@ -145,18 +155,6 @@ public class Actions {
         }
     }
 
-    public void goTurretToAprilTag(AprilTag tag, double offset) {
-        AprilTagDetection detection = cam.getAprilTagDetection(tag);
-        if (detection == null) {
-            return;
-        }
-        turret.goAngle(- detection.ftcPose.yaw + offset);
-    }
-
-    public void goTurretToGyroAngle(double offset) {
-        turret.goAngle(- getRobotAngles().getYaw(AngleUnit.RADIANS) + offset);
-    }
-
     public double getCubic(double axis) {
         return Math.pow(axis, 3);
     }
@@ -169,5 +167,26 @@ public class Actions {
         cam.log(telemetry);
         shooter.log(telemetry);
         telemetry.addData("yaw", getRobotAngles().getYaw(AngleUnit.RADIANS));
+        ballDetection.updateTelemetry(telemetry);
+    }
+
+    public Point getDetectedBallPosition() {
+        return ballDetection.getBallPosition();
+    }
+
+    public void setShooterPids() {
+        shooter.setPids();
+    }
+
+    public void aimAndDriveToBall() {
+        Point ballPos = getDetectedBallPosition();
+
+        if (ballPos != null) {
+            double errorX = ballPos.x - CameraConf.WIDTH/2.0;
+            double rx = -errorX * BallDetectionConf.kP;
+            move(getRatios(Math.PI / 2, 0.25, rx));
+        } else {
+            move(getRatios(Math.PI / 2, 0.25, 0));
+        }
     }
 }

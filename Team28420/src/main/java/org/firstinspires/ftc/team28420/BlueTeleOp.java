@@ -5,11 +5,9 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.team28420.config.CameraConf;
 import org.firstinspires.ftc.team28420.config.GamepadConf;
 import org.firstinspires.ftc.team28420.config.ShooterConf;
-import org.firstinspires.ftc.team28420.config.WheelBaseConf;
 import org.firstinspires.ftc.team28420.module.Actions;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.types.MovementParams;
@@ -38,7 +36,6 @@ public class BlueTeleOp extends LinearOpMode {
 
     private void handleMovement() {
         if (gamepad1.right_trigger > 0.2) {
-
             act.move(act.getRatiosForApriltag(AprilTag.BLUE, -2, CameraConf.RANGE_TO_TAG));
         } else if (gamepad1.right_bumper) {
             act.move(act.getRatiosLookApriltag(AprilTag.BLUE, 0, CameraConf.RANGE_TO_TAG));
@@ -100,20 +97,15 @@ public class BlueTeleOp extends LinearOpMode {
         if (gamepad1.left_bumper) {
             float power = (gamepad1.left_trigger > 0.5) ? -0.5f : 1.0f;
             act.setDribblerVelocityCoefficient(power);
+            act.setHelperWheelCoefficient(0.4f);
         } else {
-            if(gamepad2.right_trigger < 0.4)
-                act.setDribblerVelocityCoefficient(0);
+            act.setDribblerVelocityCoefficient(0);
+            if(gamepad2.right_trigger < 0.2) {
+                act.setHelperWheelCoefficient(0);
+            }
         }
 
         if (gamepad1.dpad_up) act.park();
-    }
-
-    private void handleTurret() {
-        if (gamepad2.triangle) {
-            act.goTurretToAprilTag(AprilTag.BLUE, gamepad2.right_stick_x * 10);
-        } else {
-            act.goTurretToGyroAngle(gamepad2.right_stick_x * 10);
-        }
     }
 
     @Override
@@ -132,7 +124,6 @@ public class BlueTeleOp extends LinearOpMode {
             handleMovement();
             handleShooter();
             handleIntakeAndParking();
-            handleTurret();
 
             if (gamepad2.right_bumper) {
                 act.shoot();

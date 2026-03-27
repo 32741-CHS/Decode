@@ -17,23 +17,25 @@ public class Movement {
     private double currentRB = 0.0;
 
     public static WheelsRatio<Double> vectorToRatios(MovementParams params) {
-        double sin = Math.sin(params.getMoveVector().getTheta() - Math.PI / 4);
-        double cos = Math.cos(params.getMoveVector().getTheta() - Math.PI / 4);
+        double theta = params.getMoveVector().getTheta();
+        double power = params.getMoveVector().getAbs();
+        double turn = params.getTurnAbs();
+
+        double sin = Math.sin(theta - Math.PI / 4);
+        double cos = Math.cos(theta - Math.PI / 4);
         double max = Math.max(Math.abs(sin), Math.abs(cos));
 
-        double lf = params.getMoveVector().getAbs() * cos / max + params.getTurnAbs();
-        double rf = params.getMoveVector().getAbs() * sin / max - params.getTurnAbs();
-        double lb = params.getMoveVector().getAbs() * sin / max + params.getTurnAbs();
-        double rb = params.getMoveVector().getAbs() * cos / max - params.getTurnAbs();
+        double lf = power * cos / max + turn;
+        double rf = power * sin / max - turn;
+        double lb = power * sin / max + turn;
+        double rb = power * cos / max - turn;
 
-        if ((params.getMoveVector().getAbs() + Math.abs(params.getTurnAbs())) > 1) {
-            lf /= params.getMoveVector().getAbs() + Math.abs(params.getTurnAbs());
-            rf /= params.getMoveVector().getAbs() + Math.abs(params.getTurnAbs());
-            lb /= params.getMoveVector().getAbs() + Math.abs(params.getTurnAbs());
-            rb /= params.getMoveVector().getAbs() + Math.abs(params.getTurnAbs());
-        }
+        double scale = Math.max(1.0, Math.max(
+                Math.max(Math.abs(lf), Math.abs(rf)),
+                Math.max(Math.abs(lb), Math.abs(rb))
+        ));
 
-        return new WheelsRatio<>(lf, rf, lb, rb);
+        return new WheelsRatio<>(lf / scale, rf / scale, lb / scale, rb / scale);
     }
 
     public Movement(HardwareMap hMap) {

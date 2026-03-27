@@ -12,8 +12,8 @@ public class Pusher {
         NEUTRAL
     }
     public static double INITPOS = 0.3;
-    public static double PUSHPOS = 0.7;
-    public static double NEUTRALPOS = 1;
+    public static double PUSHPOS = 0.05;
+    public static double NEUTRALPOS = 0.3;
     private final Servo pusher;
     private PusherState state = PusherState.INIT;
 

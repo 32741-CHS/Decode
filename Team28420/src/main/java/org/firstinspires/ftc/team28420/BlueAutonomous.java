@@ -69,6 +69,7 @@ public class BlueAutonomous extends LinearOpMode {
             }
             telemetry.addData("counter", counter);
             act.updateShooter();
+            act.updateApriltags();
             act.log();
             telemetry.update();
         }
