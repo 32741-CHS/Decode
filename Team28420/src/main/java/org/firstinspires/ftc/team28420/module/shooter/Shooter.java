@@ -64,7 +64,7 @@ public class Shooter {
         pusher.setState(Pusher.PusherState.NEUTRAL);
         setPids();
 
-        setMotorsZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //setMotorsZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void afterStart() {
@@ -129,16 +129,16 @@ public class Shooter {
 
         switch (state) {
             case SHOOTING:
-                if (shooterTime.milliseconds() >= 500) {
+                if (shooterTime.milliseconds() >= 150) {
                     pushBall(false);
                     state = Shooter.ShooterState.STOP_SHOOTING;
                     shooterTime.reset();
                 }
                 break;
             case STOP_SHOOTING:
-                if (shooterTime.milliseconds() >= 500) {
+                if (shooterTime.milliseconds() >= 150) {
                     if (manualControl) {
-                        // если ручной режим, то после выстрела не поворачиваем барабан
+                        rotateRevolver(-120);
                         state = Shooter.ShooterState.IDLE;
                     } else {
                         sortedNextBall();
@@ -164,7 +164,7 @@ public class Shooter {
             if (!sorter.getCurMotif().isEmpty()) {
                 sorter.dropLastBall();
 
-                if (sorter.getCurMotif().isEmpty()) rotateRevolver(-120);
+                if (!sorter.getCurMotif().isEmpty()) rotateRevolver(-120);
                 else {
                     rotateRevolver(-60);
                     sorter.setCorrectMotif(false);
@@ -402,7 +402,7 @@ public class Shooter {
     }
 
     private boolean shouldScan() {
-        return !isShootable() && !manualControl && !sorter.isMotifFull();
+        return !isShootable() && !manualControl && !sorter.isMotifFull();// && ShooterConf.IS_AUTO;
     }
 
     public void appendBallToMotif(char color) {

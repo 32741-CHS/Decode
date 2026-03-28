@@ -3,28 +3,27 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.team28420.config.BallDetectionConf;
 import org.firstinspires.ftc.team28420.config.CameraConf;
 import org.firstinspires.ftc.team28420.config.GamepadConf;
 import org.firstinspires.ftc.team28420.config.ShooterConf;
 import org.firstinspires.ftc.team28420.module.Actions;
-import org.firstinspires.ftc.team28420.processors.BallDetection;
 import org.firstinspires.ftc.team28420.types.AprilTag;
 import org.firstinspires.ftc.team28420.types.MovementParams;
 import org.firstinspires.ftc.team28420.types.PolarVector;
 import org.firstinspires.ftc.team28420.types.Position;
 import org.firstinspires.ftc.team28420.types.WheelsRatio;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.opencv.core.Point;
-@TeleOp(name = "Auto Motif Intake", group = "New Actions")
+
+ @TeleOp(name = "Auto Motif Intake", group = "New Actions")
 public class BallDetectionTeleOp extends LinearOpMode {
     private Actions act;
     private boolean dpadPressed = false;
     private void initialize() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         act = new Actions(hardwareMap, telemetry);
+
+        ShooterConf.IS_AUTO = false;
 
         act.init();
     }
@@ -76,7 +75,7 @@ public class BallDetectionTeleOp extends LinearOpMode {
         handleRevolverInput();
 
         float shooterPower = (float) ((gamepad2.right_trigger > 0.4) ? Math.pow(gamepad2.right_trigger, 2) : 0);
-        shooterPower *= gamepad2.left_bumper ? 1.42 : 1;
+        shooterPower *= gamepad2.left_bumper ? 1.1 : 1;
 
         act.prepareForShoot(shooterPower);
         if (gamepad2.right_bumper) act.shoot();
@@ -88,8 +87,10 @@ public class BallDetectionTeleOp extends LinearOpMode {
     }
     private void handleRevolverInput() {
         if (!dpadPressed) {
-            if (gamepad2.dpad_left) rotateRevolver(-60);
-            if (gamepad2.dpad_right) rotateRevolver(60);
+            int shooterMultiplier = gamepad2.right_trigger > 0.2?2:1;
+
+            if (gamepad2.dpad_left) rotateRevolver(-60 * shooterMultiplier);
+            if (gamepad2.dpad_right) rotateRevolver(60 * shooterMultiplier);
         }
         dpadPressed = (gamepad2.dpad_left || gamepad2.dpad_right || gamepad2.dpad_up || gamepad2.dpad_down);
 

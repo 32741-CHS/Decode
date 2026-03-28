@@ -6,6 +6,7 @@ import org.opencv.core.Scalar;
 
 @Config
 public class ShooterConf {
+    public static boolean IS_AUTO = false;
     public static double REVOLVER_VELOCITY = 1331;
     public static double SORT_P = 6.2;
     public static Scalar cslowGreen = new Scalar(70, 0.4, 0.019);
