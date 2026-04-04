@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.robotcore.internal.camera.delegating.DelegatingCaptureSequence;
+
 @TeleOp(name="Murali Opmode")
 public class Murali extends OpMode {
     DcMotorEx motor;
@@ -31,4 +33,10 @@ public class Murali extends OpMode {
             motor.setPower(0);
         }
     }
-}
+    {
+        
+
+
+    }
+
+        }
