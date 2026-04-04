@@ -19,10 +19,10 @@ public class Teleop_V1 extends OpMode {
         backLeftDrive = hardwareMap.get(DcMotorEx.class, "backLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotorEx.class, "frontRightDrive");
         backRightDrive = hardwareMap.get(DcMotorEx.class, "backRightDrive");
-        frontLeftDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotorEx.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotorEx.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotorEx.Direction.FORWARD);
     }
 
     @Override
