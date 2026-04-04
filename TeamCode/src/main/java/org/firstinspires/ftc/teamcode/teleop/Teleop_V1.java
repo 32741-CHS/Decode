@@ -38,7 +38,7 @@ public class Teleop_V1 extends OpMode {
         frontRightDrive.setPower((axial - lateral + yaw) * 0.5);
         backRightDrive.setPower((axial + lateral - yaw) * 0.5);
 
-        telemetry.addData("Current axial", axial);
+        telemetry.addData("Current axials", axial);
         telemetry.addData("Current lateral", lateral);
         telemetry.addData("Current yaw", yaw);
         telemetry.addData("Average Power", (frontLeftDrive.getPower()
