@@ -33,8 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.CRServo;
 
 /*
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -53,6 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class BasicOpMode_Linear extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontRight, frontLeft, backRight, backLeft;
+
+    public CRServo leftServo, rightServo;
+
     @Override
     public void init() {
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -63,7 +67,8 @@ public class BasicOpMode_Linear extends OpMode {
         backRight = hardwareMap.get(DcMotor.class, "rightBack");
         backLeft = hardwareMap.get(DcMotor.class, "leftBack");
 
-
+        leftServo = hardwareMap.get(CRServo.class, "leftServo");
+        rightServo = hardwareMap.get(CRServo.class, "rightServo");
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Initialized");
@@ -104,6 +109,14 @@ public class BasicOpMode_Linear extends OpMode {
         backLeft.setPower(speeds[2]);
         backRight.setPower(speeds[3]);
 
+        if(gamepad1.a){
+            leftServo.setPower(1);
+            rightServo.setPower(-1);
+        }
+        if(gamepad1.b){
+            leftServo.setPower(0);
+            rightServo.setPower(0);
+        }
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "frontLeft (%.2f), frontRight (%.2f), backLeft (%.2f), backRight (%.2f)",
