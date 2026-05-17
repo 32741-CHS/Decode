@@ -74,6 +74,7 @@ public class BasicOpMode_Linear extends OpMode {
     public void loop() {
         // Mecanum drive is controlled with three axes: drive (front-and-back),
         // strafe (left-and-right), and twist (rotating the whole chassis).
+
         double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
         double turn  =  gamepad1.right_stick_x;
