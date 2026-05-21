@@ -9,7 +9,7 @@ public class Motor_FlywheelOpMode extends LinearOpMode {
     @Override
     public void runOpMode() {
         // motor name must match the port name in your robot configuration
-        Motor_FlywheelController motor = new Motor_FlywheelController(hardwareMap, "practiceMotor");
+        Motor_FlywheelController motor = new Motor_FlywheelController(hardwareMap, "flywheel");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();

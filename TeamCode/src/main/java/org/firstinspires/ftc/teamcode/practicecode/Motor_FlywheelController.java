@@ -10,7 +10,7 @@ public class Motor_FlywheelController {
     public Motor_FlywheelController(HardwareMap hardwareMap, String motorName) {
         motor = hardwareMap.get(DcMotor.class, motorName);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setPower(double power) {
