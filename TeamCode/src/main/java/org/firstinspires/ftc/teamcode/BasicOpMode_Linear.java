@@ -51,9 +51,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
 public class BasicOpMode_Linear extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontRight, frontLeft, backRight, backLeft;
+    private DcMotor frontRight, frontLeft, backRight, backLeft, flywheel;
     public CRServo leftServo, rightServo;
     private boolean servoIsRunning;
+    private boolean flywheelOn = false;
+    private boolean lastX = false;
 
     @Override
     public void init() {
@@ -64,7 +66,7 @@ public class BasicOpMode_Linear extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "leftFront");
         backRight = hardwareMap.get(DcMotor.class, "rightBack");
         backLeft = hardwareMap.get(DcMotor.class, "leftBack");
-
+        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         leftServo = hardwareMap.get(CRServo.class, "leftServo");
         rightServo = hardwareMap.get(CRServo.class, "rightServo");
         backRight.setDirection(DcMotor.Direction.REVERSE);
@@ -116,10 +118,14 @@ public class BasicOpMode_Linear extends OpMode {
         if (servoIsRunning) {
             leftServo.setPower(-1);
             rightServo.setPower(1);
+            flywheel.setPower(1.0);
         } else {
             leftServo.setPower(0);
             rightServo.setPower(0);
+            flywheel.setPower(0);
         }
+
+
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -131,6 +137,8 @@ public class BasicOpMode_Linear extends OpMode {
                 speeds[2],
                 speeds[3]);
         telemetry.addData("ServoIsRunning", servoIsRunning);
+        telemetry.addData("Flywheel", flywheelOn ? "ON" : "OFF");
+        telemetry.addData("Flywheel Power", "%.2f", flywheel.getPower());
         telemetry.update();
     }
 }
