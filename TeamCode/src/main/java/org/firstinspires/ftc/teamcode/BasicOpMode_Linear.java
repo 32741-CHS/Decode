@@ -31,8 +31,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
+@TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
 public class BasicOpMode_Linear extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontRight, frontLeft, backRight, backLeft;
@@ -79,13 +79,13 @@ public class BasicOpMode_Linear extends OpMode {
         // strafe (left-and-right), and twist (rotating the whole chassis).
         double drive = -gamepad1.left_stick_y;
         double strafe = gamepad1.left_stick_x;
-        double turn  =  gamepad1.right_stick_x;
+        double turn = gamepad1.right_stick_x;
 
         double[] speeds = {
-                (drive + strafe + turn),
-                (drive - strafe - turn),
-                (drive - strafe + turn),
-                (drive + strafe - turn)
+            (drive + strafe + turn),
+            (drive - strafe - turn),
+            (drive - strafe + turn),
+            (drive + strafe - turn)
         };
 
         // Loop through all values in the speeds[] array and find the greatest
@@ -123,8 +123,13 @@ public class BasicOpMode_Linear extends OpMode {
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "frontLeft (%.2f), frontRight (%.2f), backLeft (%.2f), backRight (%.2f)",
-                speeds[0], speeds[1], speeds[2], speeds[3]);
+        telemetry.addData(
+                "Motors",
+                "frontLeft (%.2f), frontRight (%.2f), backLeft (%.2f), backRight (%.2f)",
+                speeds[0],
+                speeds[1],
+                speeds[2],
+                speeds[3]);
         telemetry.addData("ServoIsRunning", servoIsRunning);
         telemetry.update();
     }
