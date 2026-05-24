@@ -187,8 +187,7 @@ public class BasicOpMode_Linear extends OpMode {
                 speeds[3]);
 
         telemetry.addData("ServoIsRunning", servoIsRunning);
-        telemetry.addData("Flywheel", flywheelOn ? "ON" : "OFF");
-        telemetry.addData("Flywheel Power", "%.2f", flywheel.getPower());
+        telemetry.addData("Flywheel Velocity", flywheel.getVelocity());
         telemetry.update();
     }
 }
