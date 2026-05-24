@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -59,10 +61,10 @@ import java.util.Locale;
 @TeleOp(name="Basic: Linear OpMode ChargedCreeper", group="Linear OpMode")
 public class BasicOpMode_Linear extends OpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontRight, frontLeft, backRight, backLeft, flywheel;
+    private DcMotor frontRight, frontLeft, backRight, backLeft;
+    private DcMotorEx flywheel;
     public CRServo leftServo, rightServo;
     private boolean servoIsRunning;
-    private boolean flywheelOn = false;
     private boolean lastX = false;
     private GoBildaPinpointDriver odo;
 
@@ -75,7 +77,9 @@ public class BasicOpMode_Linear extends OpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "leftFront");
         backRight = hardwareMap.get(DcMotor.class, "rightBack");
         backLeft = hardwareMap.get(DcMotor.class, "leftBack");
-        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
+        flywheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftServo = hardwareMap.get(CRServo.class, "leftServo");
         rightServo = hardwareMap.get(CRServo.class, "rightServo");
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
@@ -138,11 +142,11 @@ public class BasicOpMode_Linear extends OpMode {
         if (servoIsRunning) {
             leftServo.setPower(-1);
             rightServo.setPower(1);
-            flywheel.setPower(1.0);
+            flywheel.setVelocity(2000);
         } else {
             leftServo.setPower(0);
             rightServo.setPower(0);
-            flywheel.setPower(0);
+            flywheel.setVelocity(0);
         }
 
         odo.update();
