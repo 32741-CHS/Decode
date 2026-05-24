@@ -198,7 +198,7 @@ public class BasicOpMode_Linear extends OpMode {
                 double headingError = targetHeading - pos.getHeading(AngleUnit.DEGREES);
                 double kP = 0.02;
                 double correction = headingError * kP;
-                double drivePower = 1;
+                double drivePower = 0.5;
                 double leftPower = drivePower + correction;
                 double rightPower = drivePower - correction;
                 leftServo.setPower(leftPower);
