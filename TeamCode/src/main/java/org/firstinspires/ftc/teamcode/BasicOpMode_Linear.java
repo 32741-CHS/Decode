@@ -65,6 +65,8 @@ public class BasicOpMode_Linear extends OpMode {
     private boolean flywheelOn = false;
     private boolean lastX = false;
     private GoBildaPinpointDriver odo;
+    private double targetHeading = 0;
+    private Pose2D previousPos;
 
     @Override
     public void init() {
@@ -130,9 +132,11 @@ public class BasicOpMode_Linear extends OpMode {
         if (gamepad1.a) {
             servoIsRunning = true;
             odo.resetPosAndIMU(); //resets the position to 0 and recalibrates the IMU
+            targetHeading = 0;
         } else if (gamepad1.b) {
             servoIsRunning = false;
             odo.recalibrateIMU(); //recalibrates the IMU without resetting position
+            targetHeading = 0;
         }
 
         if (servoIsRunning) {
@@ -147,13 +151,22 @@ public class BasicOpMode_Linear extends OpMode {
 
         odo.update();
         Pose2D pos = odo.getPosition();
-        String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Position", data);
+        if(servoIsRunning) {
+            if (Math.abs(turn) > 0.05) {
+                targetHeading = pos.getHeading(AngleUnit.DEGREES);
+            } else {
+                driveStraight(pos);
+            }
+        }
 
-        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", odo.getVelX(DistanceUnit.MM), odo.getVelY(DistanceUnit.MM), odo.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES));
-        telemetry.addData("Velocity", velocity);
         telemetry.addData("Pinpoint Status", odo.getDeviceStatus());
         telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
+
+        String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+        telemetry.addData("Position", data);
+        telemetry.addData("Heading", pos.getHeading(AngleUnit.DEGREES));
+        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", odo.getVelX(DistanceUnit.MM), odo.getVelY(DistanceUnit.MM), odo.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES));
+        telemetry.addData("Velocity", velocity);
 
         // Show the elapsed game time and wheel power
         telemetry.addData("Status", "Run Time: " + runtime.toString());
@@ -169,5 +182,24 @@ public class BasicOpMode_Linear extends OpMode {
         telemetry.addData("Flywheel", flywheelOn ? "ON" : "OFF");
         telemetry.addData("Flywheel Power", "%.2f", flywheel.getPower());
         telemetry.update();
+    }
+
+    private void driveStraight(Pose2D pos)
+    {
+        if (previousPos != null) {
+            double distanceDriven = pos.getY(DistanceUnit.MM) - previousPos.getY(DistanceUnit.MM);
+            if(distanceDriven > 20) {
+                double headingError = targetHeading - pos.getHeading(AngleUnit.DEGREES);
+                double kP = 0.02;
+                double correction = headingError * kP;
+                double drivePower = 1;
+                double leftPower = drivePower + correction;
+                double rightPower = drivePower - correction;
+                leftServo.setPower(leftPower);
+                rightServo.setPower(rightPower);
+            }
+        }
+
+        previousPos = pos;
     }
 }
