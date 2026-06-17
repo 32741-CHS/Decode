@@ -17,6 +17,7 @@ public class BaseTeleop extends OpMode {
         telemetry.update();
     }
 
+    @Override
     public void loop() {
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
