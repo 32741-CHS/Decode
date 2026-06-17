@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -13,7 +11,7 @@ public class Chassis {
     private IMU imu;
 
 
-    public Chassis() {
+    public void init(HardwareMap hardwareMap) {
         flDrive = hardwareMap.get(DcMotor.class, "flDrive");
         frDrive = hardwareMap.get(DcMotor.class, "frDrive");
         brDrive = hardwareMap.get(DcMotor.class, "brDrive");
