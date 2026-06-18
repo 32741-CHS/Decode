@@ -5,7 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LazySusan;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
 /**
@@ -28,6 +31,7 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEx;
  *   B (toggle)    → flywheel on/off
  *
  * IMU: logo UP, USB FORWARD
+ * Webcam: "Webcam 1" on C920, 640x480, mounted on turret
  */
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
@@ -35,17 +39,28 @@ public class MainTeleOp extends OpMode {
     private final RobotHardware hw = new RobotHardware();
     private Drivetrain drivetrain;
     private Intake intake;
+    private LazySusan susan;
+    private Flywheel flywheel;
+    private Vision vision;
 
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
 
     private boolean fieldRelative = false;
+    private boolean autoShoot = false;
+
+    // TODO: set this manually before each match. we need a better way to do this.
+    private boolean isRedAlliance = false;
 
     @Override
     public void init() {
         hw.init(hardwareMap);
         drivetrain = new Drivetrain(hw);
         intake = new Intake(hw);
+        susan = new LazySusan(hw);
+        flywheel = new Flywheel(hw);
+        vision = new Vision();
+        vision.init(hardwareMap);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -56,13 +71,10 @@ public class MainTeleOp extends OpMode {
         gp1.update(gamepad1);
         gp2.update(gamepad2);
 
-        // toggle field relative on A press
-        // TODO: ask drivers to choose between robot / field centric bc
+        // === Controller 2: Drive ===
         if (gp2.a.wasPressed()) {
             fieldRelative = !fieldRelative;
         }
-
-        // controller 2 drives
         drivetrain.setSpeedMode(gp2.rb.isHeld(), gp2.lb.isHeld());
         drivetrain.drive(
             -gamepad2.left_stick_y,
@@ -71,16 +83,63 @@ public class MainTeleOp extends OpMode {
             fieldRelative
         );
 
-        // controller 1: intake on left stick Y (back = in, forward = out)
-        // TODO: Change above to be automatic and TOGGLEABLE once intake functionality is confirmed, keep it like this for now though.
+        // === Controller 1: Operator ===
+
+        // intake on left stick Y
         intake.setPower(-gamepad1.left_stick_y);
 
-        // TODO: turret on dpad
-        // TODO: flywheel toggle + speed on B and dpad up/down
-        // TODO: auto-shoot toggle on A
+        // flywheel toggle (B) and speed (dpad up/down)
+        if (gp1.b.wasPressed()) {
+            flywheel.setRunning(!flywheel.isRunning());
+        }
+        if (gp1.dpadUp.wasPressed()) {
+            flywheel.speedUp();
+        }
+        if (gp1.dpadDown.wasPressed()) {
+            flywheel.speedDown();
+        }
 
+        // auto-shoot toggle (A)
+        if (gp1.a.wasPressed()) {
+            autoShoot = !autoShoot;
+        }
+
+        if (autoShoot) {
+            // auto mode: vision tracks goal, susan aims, flywheel runs
+            int goalTag = vision.getGoalTagId(isRedAlliance);
+
+            if (vision.isTagVisible(goalTag)) {
+                double bearing = vision.getTagBearing(goalTag);
+                double targetAngle = susan.bearingToTargetAngle(bearing);
+                susan.setAngle(targetAngle);
+            }
+            // tag not visible = susan holds position
+
+            // flywheel stays on during auto-shoot
+            if (!flywheel.isRunning()) {
+                flywheel.setRunning(true);
+            }
+        } else {
+            // manual mode: operator controls susan with dpad
+            if (gp1.dpadLeft.isHeld()) {
+                susan.setPower(-0.25);
+            } else if (gp1.dpadRight.isHeld()) {
+                susan.setPower(0.25);
+            } else {
+                susan.setPower(0);
+            }
+        }
+
+        // === Telemetry ===
         telemetry.addData("Drive", drivetrain.getSpeedLabel());
         telemetry.addData("Mode", fieldRelative ? "Field Relative" : "Robot Centric");
+        telemetry.addData("Flywheel", flywheel.getSpeedLabel());
+        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", susan.getAngle()));
+        telemetry.addData("Auto Shoot", autoShoot ? "ON" : "OFF");
+        if (autoShoot) {
+            int goalTag = vision.getGoalTagId(isRedAlliance);
+            telemetry.addData("Goal Tag", vision.isTagVisible(goalTag) ? "FOUND" : "NOT FOUND");
+        }
         telemetry.update();
     }
 
@@ -88,5 +147,8 @@ public class MainTeleOp extends OpMode {
     public void stop() {
         drivetrain.stop();
         intake.stop();
+        susan.stop();
+        flywheel.stop();
+        vision.stop();
     }
 }
