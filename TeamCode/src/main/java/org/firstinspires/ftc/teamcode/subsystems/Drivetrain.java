@@ -4,7 +4,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// mecanum drive. controller 2 only.
+// mecanum drive, controller 2 only.
 // LB = turbo, RB = slow, neither = normal
 public class Drivetrain {
 
@@ -17,6 +17,7 @@ public class Drivetrain {
     private double speedMultiplier = SPEED_NORMAL;
 
     public Drivetrain(RobotHardware hw) {
+
         this.hw = hw;
     }
 
@@ -65,6 +66,7 @@ public class Drivetrain {
     }
 
     public double getSpeedMultiplier() {
+
         return speedMultiplier;
     }
 
@@ -82,6 +84,7 @@ public class Drivetrain {
     }
 
     private double deadband(double v) {
+
         return Math.abs(v) < STICK_DEADBAND ? 0 : v;
     }
 }
