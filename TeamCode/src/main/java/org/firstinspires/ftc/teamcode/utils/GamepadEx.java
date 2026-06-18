@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.utils;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-// wraps a gamepad so we can detect button presses and toggles easily
+// wraps the gamepad
 // call update() once per loop, then check wasPressed() or wasToggled()
 public class GamepadEx {
 
