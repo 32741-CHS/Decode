@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// lazy susan turret. friction wheel drive, 312rpm goBilda motor.
-// 270 degree max rotation (±135 from center). NEVER go past this.
 // encoder resets on init so center = 0 degrees.
 public class LazySusan {
 
@@ -14,10 +12,10 @@ public class LazySusan {
     // 537.7 ticks per revolution at output shaft for 312rpm goBilda
     private static final double TICKS_PER_REV = 537.7;
 
-    // max rotation in degrees from center (±135 = 270 total)
+    // max rotation in degrees from center, 270 total
     private static final double MAX_DEGREES = 135.0;
 
-    // P constant for auto-aim (tune at practice, start conservative)
+    // P constant for auto aim (tune at practice, start conservative)
     private static final double Kp = 0.01;
 
     // deadband in degrees — stop correcting if we're this close
@@ -36,7 +34,6 @@ public class LazySusan {
         encoderOffset = 0;
     }
 
-    // manual control. power > 0 = right, power < 0 = left.
     // stops at 270 limit.
     public void setPower(double power) {
         double angle = getAngle();
@@ -55,7 +52,6 @@ public class LazySusan {
     }
 
     // auto-aim: P controller to turn to a target angle (in degrees).
-    // pass in the absolute field angle you want the turret to face.
     public void setAngle(double targetAngle) {
         // clamp target to 270 limit
         targetAngle = Math.max(-MAX_DEGREES, Math.min(MAX_DEGREES, targetAngle));
@@ -77,8 +73,6 @@ public class LazySusan {
         hw.lazySusan.setPower(power);
     }
 
-    // convert camera bearing to absolute turret angle.
-    // camera is on the turret, so bearing = how far off-center the tag is.
     // current turret angle + bearing = where we need to point.
     public double bearingToTargetAngle(double bearingDegrees) {
         return getAngle() + bearingDegrees;

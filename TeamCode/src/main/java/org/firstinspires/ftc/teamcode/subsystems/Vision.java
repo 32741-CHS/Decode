@@ -13,15 +13,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-// april tag vision for goal tracking.
-// camera is mounted on the turret, moves with it.
-// DECODE goal tags: 20 (blue), 24 (red).
+
+// 20 (blue), 24 (red)
 public class Vision {
 
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
-    // DECODE goal tag IDs
     public static final int BLUE_GOAL_TAG = 20;
     public static final int RED_GOAL_TAG = 24;
 
@@ -34,7 +32,7 @@ public class Vision {
                 .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
                 .build();
 
-        // decimation 2 is a good balance of range vs fps for C920
+        // idk change
         processor.setDecimation(2);
 
         portal = new VisionPortal.Builder()
@@ -54,23 +52,20 @@ public class Vision {
         return getTagById(tagId) != null;
     }
 
-    // get bearing (in degrees) to a goal tag. positive = tag is to the right.
+    // get bearing (in degrees) to a goal tag
     // returns 0 if tag not visible.
     public double getTagBearing(int tagId) {
         AprilTagDetection tag = getTagById(tagId);
         if (tag == null) return 0;
-        // ftcPose.bearing is in radians from setOutputUnits, convert to degrees
         return Math.toDegrees(tag.ftcPose.bearing);
     }
 
-    // get range (distance) to a goal tag in meters. returns -1 if not visible.
     public double getTagRange(int tagId) {
         AprilTagDetection tag = getTagById(tagId);
         if (tag == null) return -1;
         return tag.ftcPose.range;
     }
 
-    // get yaw of the tag relative to camera. useful for knowing how centered we are.
     public double getTagYaw(int tagId) {
         AprilTagDetection tag = getTagById(tagId);
         if (tag == null) return 0;
