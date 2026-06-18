@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// rubber band intake. stick back = in, stick forward = out.
 public class Intake {
 
     private final RobotHardware hw;
@@ -13,12 +12,15 @@ public class Intake {
         this.hw = hw;
     }
 
-    // power > 0 = out, power < 0 = in
+    // power > 0 = out
+    // power < 0 = in
     public void setPower(double power) {
+
         hw.intake.setPower(power);
     }
 
     public void stop() {
+
         hw.intake.setPower(0);
     }
 }

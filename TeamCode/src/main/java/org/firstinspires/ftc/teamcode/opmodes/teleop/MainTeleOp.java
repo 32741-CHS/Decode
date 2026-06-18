@@ -57,6 +57,7 @@ public class MainTeleOp extends OpMode {
         gp2.update(gamepad2);
 
         // toggle field relative on A press
+        // TODO: ask drivers to choose between robot / field centric bc
         if (gp2.a.wasPressed()) {
             fieldRelative = !fieldRelative;
         }
@@ -71,6 +72,7 @@ public class MainTeleOp extends OpMode {
         );
 
         // controller 1: intake on left stick Y (back = in, forward = out)
+        // TODO: Change above to be automatic and TOGGLEABLE once intake functionality is confirmed, keep it like this for now though.
         intake.setPower(-gamepad1.left_stick_y);
 
         // TODO: turret on dpad
