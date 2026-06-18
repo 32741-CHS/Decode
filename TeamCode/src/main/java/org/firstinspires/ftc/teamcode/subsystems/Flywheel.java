@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 // flywheel shooter. 5203 series 6000rpm motor.
@@ -18,6 +21,9 @@ public class Flywheel {
 
     public Flywheel(RobotHardware hw) {
         this.hw = hw;
+
+        hw.flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        hw.flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     // toggle flywheel on/off

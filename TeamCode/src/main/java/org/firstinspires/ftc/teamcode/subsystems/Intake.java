@@ -10,6 +10,7 @@ public class Intake {
 
     public Intake(RobotHardware hw) {
         this.hw = hw;
+        hw.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     // power > 0 = out

@@ -31,6 +31,7 @@ public class LazySusan {
         // reset encoder so center (facing forward) = 0
         hw.lazySusan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hw.lazySusan.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        hw.lazySusan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         encoderOffset = 0;
     }
 
