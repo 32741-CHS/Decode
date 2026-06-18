@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
 /**
@@ -33,6 +34,7 @@ public class MainTeleOp extends OpMode {
 
     private final RobotHardware hw = new RobotHardware();
     private Drivetrain drivetrain;
+    private Intake intake;
 
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
@@ -43,6 +45,7 @@ public class MainTeleOp extends OpMode {
     public void init() {
         hw.init(hardwareMap);
         drivetrain = new Drivetrain(hw);
+        intake = new Intake(hw);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -67,8 +70,9 @@ public class MainTeleOp extends OpMode {
             fieldRelative
         );
 
-        // controller 1 stuff coming soon
-        // TODO: intake on left stick Y
+        // controller 1: intake on left stick Y (back = in, forward = out)
+        intake.setPower(-gamepad1.left_stick_y);
+
         // TODO: turret on dpad
         // TODO: flywheel toggle + speed on B and dpad up/down
         // TODO: auto-shoot toggle on A
@@ -81,5 +85,6 @@ public class MainTeleOp extends OpMode {
     @Override
     public void stop() {
         drivetrain.stop();
+        intake.stop();
     }
 }
