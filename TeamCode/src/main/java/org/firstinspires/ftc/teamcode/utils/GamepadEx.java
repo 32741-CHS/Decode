@@ -41,16 +41,19 @@ public class GamepadEx {
 
         // true the frame you just pressed it
         public boolean wasPressed() {
+
             return current && !prev;
         }
 
         // true the frame you just let go
         public boolean wasReleased() {
+
             return !current && prev;
         }
 
         // true while held
         public boolean isHeld() {
+
             return current;
         }
 
@@ -63,10 +66,12 @@ public class GamepadEx {
         }
 
         public void setToggle(boolean state) {
+
             toggleState = state;
         }
 
         public boolean getToggle() {
+
             return toggleState;
         }
 
