@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LazySusan;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
@@ -39,7 +40,7 @@ public class MainTeleOp extends OpMode {
     private final RobotHardware hw = new RobotHardware();
     private Drivetrain drivetrain;
     private Intake intake;
-    private LazySusan susan;
+    private Turret turret;
     private Flywheel flywheel;
     private Vision vision;
 
@@ -57,7 +58,7 @@ public class MainTeleOp extends OpMode {
         hw.init(hardwareMap);
         drivetrain = new Drivetrain(hw);
         intake = new Intake(hw);
-        susan = new LazySusan(hw);
+        turret = new Turret(hw);
         flywheel = new Flywheel(hw);
         vision = new Vision();
         vision.init(hardwareMap);
@@ -110,8 +111,8 @@ public class MainTeleOp extends OpMode {
 
             if (vision.isTagVisible(goalTag)) {
                 double bearing = vision.getTagBearing(goalTag);
-                double targetAngle = susan.bearingToTargetAngle(bearing);
-                susan.setAngle(targetAngle);
+                double targetAngle = turret.bearingToTargetAngle(bearing);
+                turret.setAngle(targetAngle);
             }
             // tag not visible = susan holds position
 
@@ -134,7 +135,7 @@ public class MainTeleOp extends OpMode {
         telemetry.addData("Drive", drivetrain.getSpeedLabel());
         telemetry.addData("Mode", fieldRelative ? "Field Relative" : "Robot Centric");
         telemetry.addData("Flywheel", flywheel.getSpeedLabel());
-        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", susan.getAngle()));
+        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", turret.getAngle()));
         telemetry.addData("Auto Shoot", autoShoot ? "ON" : "OFF");
         if (autoShoot) {
             int goalTag = vision.getGoalTagId(isRedAlliance);
@@ -147,7 +148,7 @@ public class MainTeleOp extends OpMode {
     public void stop() {
         drivetrain.stop();
         intake.stop();
-        susan.stop();
+        turret.stop();
         flywheel.stop();
         vision.stop();
     }

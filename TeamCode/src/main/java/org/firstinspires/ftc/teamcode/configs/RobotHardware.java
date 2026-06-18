@@ -14,7 +14,7 @@ public class RobotHardware {
     public DcMotor backLeft;
     public DcMotor backRight;
 
-    public DcMotor lazySusan;
+    public DcMotor turret;
     public DcMotor flywheel;
     public DcMotor intake;
 
@@ -38,8 +38,8 @@ public class RobotHardware {
         }
 
         // turret
-        lazySusan = hardwareMap.get(DcMotor.class, "lazySusan");
-        lazySusan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret = hardwareMap.get(DcMotor.class, "turret");
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // shooter
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
