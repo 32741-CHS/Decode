@@ -59,8 +59,7 @@ public class MainTeleOp extends OpMode {
         intake = new Intake(hw);
         susan = new LazySusan(hw);
         flywheel = new Flywheel(hw);
-        vision = new Vision();
-        vision.init(hardwareMap);
+        vision = new Vision(hw);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();

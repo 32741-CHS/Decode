@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import android.util.Size;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.robot.Robot;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -16,14 +18,15 @@ import java.util.List;
 
 // 20 (blue), 24 (red)
 public class Vision {
-
+    private final RobotHardware hw;
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
     public static final int BLUE_GOAL_TAG = 20;
     public static final int RED_GOAL_TAG = 24;
 
-    public void init(HardwareMap hardwareMap) {
+    public Vision(RobotHardware hw) {
+        this.hw = hw;
         processor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
@@ -36,7 +39,7 @@ public class Vision {
         processor.setDecimation(2);
 
         portal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCamera(hw.vision)
                 .setCameraResolution(new Size(640, 480))
                 .addProcessor(processor)
                 .build();
