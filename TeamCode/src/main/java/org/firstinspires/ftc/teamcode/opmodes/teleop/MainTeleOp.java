@@ -111,8 +111,7 @@ public class MainTeleOp extends OpMode {
 
             if (vision.isTagVisible(goalTag)) {
                 double bearing = vision.getTagBearing(goalTag);
-                double targetAngle = turret.bearingToTargetAngle(bearing);
-                turret.setAngle(targetAngle);
+                turret.slewTo(bearing);
             }
             // tag not visible = susan holds position
 
@@ -123,11 +122,11 @@ public class MainTeleOp extends OpMode {
         } else {
             // manual mode: operator controls susan with dpad
             if (gp1.dpadLeft.isHeld()) {
-                susan.setPower(-0.25);
+                turret.setPower(-0.25);
             } else if (gp1.dpadRight.isHeld()) {
-                susan.setPower(0.25);
+                turret.setPower(0.25);
             } else {
-                susan.setPower(0);
+                turret.setPower(0);
             }
         }
 
@@ -135,7 +134,7 @@ public class MainTeleOp extends OpMode {
         telemetry.addData("Drive", drivetrain.getSpeedLabel());
         telemetry.addData("Mode", fieldRelative ? "Field Relative" : "Robot Centric");
         telemetry.addData("Flywheel", flywheel.getSpeedLabel());
-        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", turret.getAngle()));
+        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", turret.getCurrentAngle()));
         telemetry.addData("Auto Shoot", autoShoot ? "ON" : "OFF");
         if (autoShoot) {
             int goalTag = vision.getGoalTagId(isRedAlliance);

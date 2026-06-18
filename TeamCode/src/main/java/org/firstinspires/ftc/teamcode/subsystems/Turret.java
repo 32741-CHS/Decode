@@ -32,7 +32,6 @@ public class Turret {
         this.hw = hw;
         hw.turret.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         hw.turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
     }
 
     public double getCurrentAngle() {
@@ -71,5 +70,13 @@ public class Turret {
         }
         hw.turret.setPower(power);
         lastError = error;
+    }
+
+    public void setPower(double power) {
+        hw.turret.setPower(power);
+    }
+
+    public void stop() {
+        resetTimer();
     }
 }
