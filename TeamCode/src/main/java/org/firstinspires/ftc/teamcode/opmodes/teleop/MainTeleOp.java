@@ -27,7 +27,6 @@ import org.firstinspires.ftc.teamcode.utils.GamepadEx;
  *   B (toggle)    → flywheel on/off
  *
  * IMU: logo UP, USB FORWARD
- * Config names: frontLeft, frontRight, backLeft, backRight, lazySusan, flywheel, intake, imu
  */
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {

@@ -6,8 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-// all hardware lives here. if wiring changes, only this file needs updating.
-// config names MUST match what's on the driver station phone.
+// all hardware goes HERE!!! if wiring changes, only this file needs updating.
 public class RobotHardware {
 
     public DcMotor frontLeft;
@@ -28,7 +27,7 @@ public class RobotHardware {
         backLeft   = hardwareMap.get(DcMotor.class, "backLeft");
         backRight  = hardwareMap.get(DcMotor.class, "backRight");
 
-        // left side reversed, right side forward (standard mecanum)
+        // left side reversed, right side forward
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -42,7 +41,7 @@ public class RobotHardware {
         lazySusan = hardwareMap.get(DcMotor.class, "lazySusan");
         lazySusan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // shooter - float so it coasts down
+        // shooter
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -51,7 +50,7 @@ public class RobotHardware {
         intake = hardwareMap.get(DcMotor.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
-        // imu - logo UP, USB FORWARD
+        // imu (change orientation based on final pos, but lowk have no clue where itll be)
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(
             new RevHubOrientationOnRobot(

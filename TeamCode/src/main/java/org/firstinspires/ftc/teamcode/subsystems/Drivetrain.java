@@ -23,7 +23,7 @@ public class Drivetrain {
     // mecanum drive. pass in stick values and whether to use field relative mode
     public void drive(double y, double x, double rx, boolean fieldRelative) {
         y  = deadband(y);
-        x  = deadband(x) * 1.1;  // slight strafe boost, mecanum needs it
+        x  = deadband(x) * 1.1; // idk everyone does this
         rx = deadband(rx);
 
         if (fieldRelative) {
@@ -43,7 +43,6 @@ public class Drivetrain {
         double bl = (y - x + rx);
         double br = (y + x - rx);
 
-        // keep everything between -1 and 1
         double max = Math.max(1.0, Math.max(Math.abs(fl),
                          Math.max(Math.abs(fr),
                          Math.max(Math.abs(bl), Math.abs(br)))));
