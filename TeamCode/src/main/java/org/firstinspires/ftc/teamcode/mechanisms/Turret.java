@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @Config
 public class Turret {
     private DcMotorEx turret;
@@ -19,9 +21,18 @@ public class Turret {
     public static double targetHeading = 0.0;
     private final ElapsedTime timer = new ElapsedTime();
 
-    public void init(HardwareMap hardwareMap) {
+    private Telemetry telemetry;
+
+    public static double WHEEL_SLIP_FACTOR = 0;
+    private double MOTOR_TO_TURRET_RATIO_MM = (26.5 / 290);
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         turret = hardwareMap.get(DcMotorEx.class, "turret");
+        turret.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        this.telemetry = telemetry;
+
     }
 
     public void resetTimer() {timer.reset();}
@@ -51,5 +62,7 @@ public class Turret {
 
         turret.setPower(power);
         lastError = error;
+
+        telemetry.addData("Current turret pose", turret.getCurrentPosition());
     }
 }

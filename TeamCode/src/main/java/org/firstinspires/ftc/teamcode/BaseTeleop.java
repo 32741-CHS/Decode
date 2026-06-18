@@ -21,7 +21,7 @@ public class BaseTeleop extends OpMode {
     public void init() {
         vision.init(hardwareMap, telemetry);
         chassis.init(hardwareMap);
-        turret.init(hardwareMap);
+        turret.init(hardwareMap, telemetry);
 
         telemetry.addLine("Initialized");
         telemetry.update();
