@@ -1,74 +1,104 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.configs.FlywheelConfig;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// flywheel shooter. 5203 series 6000rpm motor.
-// on/off toggle + speed levels via dpad.
-// these speed values are EXAMPLES — tune at practice (issue #9).
 public class Flywheel {
+    private static final double TICKS_PER_REV = 28.0;
+    private static final double MAX_MOTOR_RPM = 6000;
+    private static final double MAX_VELOCITY = (MAX_MOTOR_RPM / 60.0) * TICKS_PER_REV;
 
-    private final RobotHardware hw;
-
-    // speed levels as fractions of max power
-    // TODO: tune these at practice for actual shooting distances
-    private static final double[] SPEED_LEVELS = {0.0, 0.25, 0.50, 0.75, 1.0};
-
-    private int speedLevel = 0;
-    private boolean running = false;
-
-    public Flywheel(RobotHardware hw) {
-        this.hw = hw;
-
-        hw.flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        hw.flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    public enum State {
+        IDLE, SPOOLING, READY
     }
 
-    // toggle flywheel on/off
+    private final DcMotorEx motor;
+    private int level;
+    private boolean running;
+
+    public Flywheel(RobotHardware hw) {
+        motor = (DcMotorEx) hw.flywheel;
+        motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        level = 0;
+        running = false;
+    }
+
     public void setRunning(boolean on) {
+        if (on == running) return;
         running = on;
-        updatePower();
+        if (on) {
+            if (level == 0) level = 1;
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setVelocity(levelVelocity(level));
+        } else {
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor.setPower(0);
+        }
     }
 
     public boolean isRunning() {
         return running;
     }
 
-    // cycle speed up (dpad up)
     public void speedUp() {
-        speedLevel = Math.min(speedLevel + 1, SPEED_LEVELS.length - 1);
-        updatePower();
+        if (level < 5) {
+            level++;
+            if (running) motor.setVelocity(levelVelocity(level));
+        }
     }
 
-    // cycle speed down (dpad down)
     public void speedDown() {
-        speedLevel = Math.max(speedLevel - 1, 0);
-        updatePower();
+        if (level > 0) {
+            level--;
+            if (running) motor.setVelocity(levelVelocity(level));
+        }
     }
 
-    public int getSpeedLevel() {
-        return speedLevel;
+    public int getLevel() {
+        return level;
     }
 
-    public double getCurrentSpeed() {
-        return running ? SPEED_LEVELS[speedLevel] : 0.0;
+    public double getTargetVelocity() {
+        return running ? levelVelocity(level) : 0;
     }
 
-    // get speed as a label for telemetry
+    public double getCurrentVelocity() {
+        return motor.getVelocity();
+    }
+
+    public State getState() {
+        if (!running) return State.IDLE;
+        double vel = motor.getVelocity();
+        if (vel >= levelVelocity(level) * FlywheelConfig.READY_THRESHOLD) return State.READY;
+        return State.SPOOLING;
+    }
+
     public String getSpeedLabel() {
         if (!running) return "OFF";
-        return String.format("%d%%", (int)(SPEED_LEVELS[speedLevel] * 100));
-    }
-
-    private void updatePower() {
-        hw.flywheel.setPower(running ? SPEED_LEVELS[speedLevel] : 0.0);
+        return String.format("%d%%", (int)(levelVelocity(level) / MAX_VELOCITY * 100));
     }
 
     public void stop() {
         running = false;
-        speedLevel = 0;
-        hw.flywheel.setPower(0);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(0);
+    }
+
+    private static double levelVelocity(int lvl) {
+        switch (lvl) {
+            case 0: return FlywheelConfig.LEVEL_1;
+            case 1: return FlywheelConfig.LEVEL_2;
+            case 2: return FlywheelConfig.LEVEL_3;
+            case 3: return FlywheelConfig.LEVEL_4;
+            case 4: return FlywheelConfig.LEVEL_5;
+            case 5: return FlywheelConfig.LEVEL_6;
+            default: return 0;
+        }
     }
 }
