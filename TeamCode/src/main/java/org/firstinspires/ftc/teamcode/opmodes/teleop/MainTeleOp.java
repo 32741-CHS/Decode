@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LazySusan;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
+import org.firstinspires.ftc.teamcode.utils.TelemetryManager;
 
 /**
  * Main TeleOp
@@ -45,6 +46,7 @@ public class MainTeleOp extends OpMode {
 
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
+    private TelemetryManager tm;
 
     private boolean fieldRelative = false;
     private boolean autoShoot = false;
@@ -62,8 +64,9 @@ public class MainTeleOp extends OpMode {
         vision = new Vision();
         vision.init(hardwareMap);
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        tm = new TelemetryManager(telemetry);
+        tm.addData("Status", "Initialized");
+        tm.update();
     }
 
     @Override
@@ -131,16 +134,19 @@ public class MainTeleOp extends OpMode {
         }
 
         // === Telemetry ===
-        telemetry.addData("Drive", drivetrain.getSpeedLabel());
-        telemetry.addData("Mode", fieldRelative ? "Field Relative" : "Robot Centric");
-        telemetry.addData("Flywheel", flywheel.getSpeedLabel());
-        telemetry.addData("Susan", autoShoot ? "AUTO" : String.format("%.1f deg", susan.getAngle()));
-        telemetry.addData("Auto Shoot", autoShoot ? "ON" : "OFF");
+        tm.addSection("Drive");
+        tm.addData("Speed Mode", drivetrain.getSpeedLabel());
+        tm.addData("Drive Mode", fieldRelative ? "Field Relative" : "Robot Centric");
+        tm.addSection("Shooter");
+        tm.addData("Flywheel", flywheel.getSpeedLabel());
+        tm.addData("Auto Shoot", autoShoot ? "ON" : "OFF");
+        tm.addSection("Turret");
+        tm.addData("Angle", autoShoot ? "AUTO" : String.format("%.1f deg", susan.getAngle()));
         if (autoShoot) {
             int goalTag = vision.getGoalTagId(isRedAlliance);
-            telemetry.addData("Goal Tag", vision.isTagVisible(goalTag) ? "FOUND" : "NOT FOUND");
+            tm.addData("Goal Tag", vision.isTagVisible(goalTag) ? "FOUND" : "NOT FOUND");
         }
-        telemetry.update();
+        tm.update();
     }
 
     @Override
