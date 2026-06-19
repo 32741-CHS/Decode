@@ -19,6 +19,8 @@ public class GamepadEx {
     public final Button dpadLeft  = new Button();
     public final Button dpadRight = new Button();
 
+    public float lt, rt;
+
     public void update(Gamepad gamepad) {
         a.update(gamepad.a);
         b.update(gamepad.b);
@@ -32,6 +34,11 @@ public class GamepadEx {
         dpadDown.update(gamepad.dpad_down);
         dpadLeft.update(gamepad.dpad_left);
         dpadRight.update(gamepad.dpad_right);
+
+        lt = gamepad.left_trigger;
+        rt = gamepad.right_trigger;
+
+
     }
 
     public static class Button {
