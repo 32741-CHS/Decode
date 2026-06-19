@@ -13,7 +13,7 @@ public class RobotHardware {
     public DcMotor flDrive, frDrive, blDrive, brDrive;
 
     public DcMotor turret;
-    public DcMotor flywheel;
+    public DcMotorEx flywheel;
     public DcMotor feeder;
     public DcMotor intake;
 
@@ -32,7 +32,7 @@ public class RobotHardware {
         turret = hardwareMap.get(DcMotor.class, "turret");
 
         // shooter
-        flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
 
         feeder = hardwareMap.get(DcMotor.class, "feeder");
 

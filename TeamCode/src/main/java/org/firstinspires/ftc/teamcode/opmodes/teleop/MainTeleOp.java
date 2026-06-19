@@ -46,11 +46,11 @@ public class MainTeleOp extends OpMode {
         gp2.update(gamepad2);
 
         // gamepad 1
-        drivetrain.setSpeedMultiplier(gp2.lb.isHeld(), gp2.rb.isHeld());
+        drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
         drivetrain.drive(
-            -gamepad2.left_stick_y,
-            gamepad2.left_stick_x,
-            gamepad2.right_stick_x,
+            -gamepad1.left_stick_y,
+            gamepad1.left_stick_x,
+            gamepad1.right_stick_x,
                 isFieldDriving
         );
 
@@ -74,8 +74,7 @@ public class MainTeleOp extends OpMode {
         // Telemetry
         telemetry.addData("Intake power:",  intake.getPower());
         telemetry.addData("Feeder power:", shooter.getFeederPower());
-        telemetry.addData("Flywheel power:", shooter.getFlywheelPower());
-        telemetry.addData("Time till feeder:", shooter.getTimeTillFeeder());
-        telemetry.addLine(String.format("Driving Mode: %s, Driving Speed: %s", isFieldDriving ? "field" : "robot", drivetrain.getSpeedMultiplier()));
+        telemetry.addLine(String.format("Flywheel rps: %.2f, error: %.2f", shooter.getFlywheelRPS(), shooter.getFlywheelErrorRPS()));
+        //telemetry.addLine(String.format("Driving Mode: %s, Driving Speed: %s", isFieldDriving ? "field" : "robot", drivetrain.getSpeedMultiplier()));
     }
 }

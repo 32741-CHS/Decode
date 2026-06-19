@@ -73,11 +73,11 @@ public class Drivetrain {
         else speedMultiplier = SPEED_NORMAL;
     }
 
-    public String getSpeedMultiplier() {
-        if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (d%)", speedMultiplier);
-        if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (d%)", speedMultiplier);
-        return String.format("Normal (d%)", speedMultiplier);
-    }
+    //public String getSpeedMultiplier() {
+    //    if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (d%)", speedMultiplier);
+    //    if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (d%)", speedMultiplier);
+    //    return String.format("Normal (d%)", speedMultiplier);
+    //}
 
     public void resetIMU() {
         imu.initialize(new IMU.Parameters( // TODO update these

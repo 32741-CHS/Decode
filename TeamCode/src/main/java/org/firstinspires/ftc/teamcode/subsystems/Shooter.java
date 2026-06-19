@@ -1,69 +1,82 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_6000RPM;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 @Configurable
 public class Shooter {
-    private final DcMotor flywheel, feeder;
+    private final DcMotorEx flywheel;
+    private final DcMotor feeder;
 
-    public static double STEP_AMOUNT = 0.1;
-    private static double targetFlywheelPower, targetFeederPower;
-    public static double desiredFlywheelPower = 0.0;
+    public static double STEP_AMOUNT = 1;
+    private static double targetFlywheelRPS, targetFeederPower;
+    public static double desiredFlywheelRPS = 0.0;
     public static double desiredFeederPower = 0.0;
 
-    public static double FLYWHEEL_TO_FEEDER_DELAY = 1; // seconds
-    private static ElapsedTime flywheelSpinTime = new ElapsedTime();
+    private static double MAX_FLYWHEEL_RPS = 100;
+
+    public static double kP = 4;
+    public static double kF = 14;
+
+
+    public static double FLYWHEEL_ERROR_TOLERANCE = 1;
 
     private boolean isFlywheelSpinning;
 
     public Shooter(RobotHardware hw) {
         flywheel = hw.flywheel;
-        flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(kP, 0, 0, kF));
 
         feeder = hw.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
-    public double getFlywheelPower() {
-        return flywheel.getPower();
+    public double getFlywheelRPS() {
+        return flywheel.getVelocity() / GOBILDA_5203_6000RPM;
     }
 
     public double getFeederPower() {
         return feeder.getPower();
     }
 
-    public double getTimeTillFeeder() {
-        return Math.min(FLYWHEEL_TO_FEEDER_DELAY - flywheelSpinTime.seconds(), 0.0);
-    }
-
     public void speedUpFlywheel() {
-        desiredFlywheelPower = Math.min(flywheel.getPower() + STEP_AMOUNT, 1.0);
+        desiredFlywheelRPS = Math.min(desiredFlywheelRPS + STEP_AMOUNT, MAX_FLYWHEEL_RPS);
     }
     public void slowDownFlywheel() {
-        desiredFlywheelPower = Math.max(flywheel.getPower() - STEP_AMOUNT, 0.0);
+        desiredFlywheelRPS = Math.max(desiredFlywheelRPS - STEP_AMOUNT, 0.0);
+    }
+
+    public double getFlywheelErrorRPS() {
+        return getFlywheelRPS() - targetFlywheelRPS;
     }
 
     public void shoot() {
-        targetFlywheelPower = desiredFlywheelPower;
+        targetFlywheelRPS = desiredFlywheelRPS;
         targetFeederPower = desiredFeederPower;
-
-        if (!isFlywheelSpinning) { flywheelSpinTime.reset(); }
     }
 
     public void update() {
-        flywheel.setPower(targetFlywheelPower);
-        isFlywheelSpinning = (targetFlywheelPower != 0);
+        flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
+                new PIDFCoefficients(kP, 0, 0, kF));
 
-        if (flywheelSpinTime.seconds() >= FLYWHEEL_TO_FEEDER_DELAY) {feeder.setPower(targetFeederPower);}
+        flywheel.setVelocity(targetFlywheelRPS * GOBILDA_5203_6000RPM);
 
-        targetFlywheelPower = 0; targetFeederPower = 0;
+        if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOLERANCE) {
+            feeder.setPower(targetFeederPower);
+        }
+
+        targetFlywheelRPS = 0; targetFeederPower = 0;
     }
 }
