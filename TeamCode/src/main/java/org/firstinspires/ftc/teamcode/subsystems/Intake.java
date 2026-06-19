@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
+@Configurable
 public class Intake {
 
     private final DcMotor intake;
 
     private static double targetPower;
-    private static double desiredPower; //TODO find this
+    public static double desiredPower = 0.0; //TODO find this
 
     public Intake(RobotHardware hw) {
         intake = hw.intake;

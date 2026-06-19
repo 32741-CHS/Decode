@@ -1,20 +1,22 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
+@Configurable
 public class Shooter {
     private final DcMotor flywheel, feeder;
 
-    private static final double STEP_AMOUNT = 0.1;
+    public static double STEP_AMOUNT = 0.1;
     private static double targetFlywheelPower, targetFeederPower;
-    private static double desiredFlywheelPower = 0.0;
-    private static double desiredFeederPower;
+    public static double desiredFlywheelPower = 0.0;
+    public static double desiredFeederPower = 0.0;
 
-    private static double FLYWHEEL_TO_FEEDER_DELAY = 1; // seconds
+    public static double FLYWHEEL_TO_FEEDER_DELAY = 1; // seconds
     private static ElapsedTime flywheelSpinTime = new ElapsedTime();
 
     private boolean isFlywheelSpinning;
