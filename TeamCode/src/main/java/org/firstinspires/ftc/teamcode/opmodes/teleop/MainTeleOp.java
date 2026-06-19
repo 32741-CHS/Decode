@@ -15,21 +15,23 @@ import org.firstinspires.ftc.teamcode.utils.TelemetryManager;
 /**
  * Main TeleOp
  *
+ * Both controllers:
+ *   B (toggle)    → flywheel on/off
+ *   D-pad Up      → flywheel speed up
+ *   D-pad Down    → flywheel speed down
+ *
  * Controller 2 (Driver):
  *   Left Stick    → drive + strafe
  *   Right Stick X → rotate
- *   RB (hold)     → slow mode (25%)
- *   LB (hold)     → turbo mode (100%)
  *   A (toggle)    → field-relative / robot-centric
+ *   RB (hold)     → slow mode
+ *   LB (hold)     → turbo mode
  *
  * Controller 1 (Operator):
- *   Left Stick Y  → intake (forward=OUT, backward=IN)
+ *   Left Stick Y  → intake
  *   A (toggle)    → auto-shoot on/off
- *   D-pad Left    → spin susan left (hold)
- *   D-pad Right   → spin susan right (hold)
- *   D-pad Up      → flywheel speed up
- *   D-pad Down    → flywheel speed down
- *   B (toggle)    → flywheel on/off
+ *   D-pad Left    → spin turret left (hold)
+ *   D-pad Right   → spin turret right (hold)
  *
  * IMU: logo UP, USB FORWARD
  * Webcam: "Webcam 1" on C920, 640x480, mounted on turret
@@ -86,21 +88,21 @@ public class MainTeleOp extends OpMode {
             fieldRelative
         );
 
+        // flywheel on both controllers (B toggle, dpad speed)
+        if (gp1.b.wasPressed() || gp2.b.wasPressed()) {
+            flywheel.setRunning(!flywheel.isRunning());
+        }
+        if (gp1.dpadUp.wasPressed() || gp2.dpadUp.wasPressed()) {
+            flywheel.speedUp();
+        }
+        if (gp1.dpadDown.wasPressed() || gp2.dpadDown.wasPressed()) {
+            flywheel.speedDown();
+        }
+
         // === Controller 1: Operator ===
 
         // intake on left stick Y
         intake.setPower(-gamepad1.left_stick_y);
-
-        // flywheel toggle (B) and speed (dpad up/down)
-        if (gp1.b.wasPressed()) {
-            flywheel.setRunning(!flywheel.isRunning());
-        }
-        if (gp1.dpadUp.wasPressed()) {
-            flywheel.speedUp();
-        }
-        if (gp1.dpadDown.wasPressed()) {
-            flywheel.speedDown();
-        }
 
         // auto-shoot toggle (A)
         if (gp1.a.wasPressed()) {
