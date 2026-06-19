@@ -9,33 +9,32 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// mecanum drive, controller 2 only.
-// LB = turbo, RB = slow, neither = normal
 public class Drivetrain {
 
     private static final double SPEED_SLOW   = 0.25;
     private static final double SPEED_NORMAL = 0.75;
     private static final double SPEED_TURBO  = 1.00;
+
     private static final double STICK_DEADBAND = 0.05;
 
-    private final RobotHardware hw;
+    private final DcMotor flDrive, frDrive, blDrive, brDrive;
+    private final IMU imu;
+
     private double speedMultiplier = SPEED_NORMAL;
 
 
     public Drivetrain(RobotHardware hw) {
-        this.hw = hw;
+        (flDrive = hw.flDrive).setDirection(DcMotorSimple.Direction.REVERSE);
+        (blDrive = hw.blDrive).setDirection(DcMotorSimple.Direction.REVERSE);
+        (frDrive = hw.frDrive).setDirection(DcMotorSimple.Direction.FORWARD);
+        (brDrive = hw.brDrive).setDirection(DcMotorSimple.Direction.FORWARD);
+        imu = hw.imu;
 
-        // left side reversed, right side forward
-        hw.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        hw.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        hw.frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        hw.backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        for (DcMotor m : new DcMotor[]{hw.frontLeft, hw.frontRight, hw.backLeft, hw.backRight}) {
+        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        hw.imu.initialize(new IMU.Parameters(
+        hw.imu.initialize(new IMU.Parameters( // TODO update these
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.UP,
                         RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
@@ -43,15 +42,13 @@ public class Drivetrain {
         ));
     }
 
-    // mecanum drive. pass in stick values and whether to use field relative mode
     public void drive(double y, double x, double rx, boolean fieldRelative) {
         y  = deadband(y);
-        x  = deadband(x) * 1.1; // idk everyone does this
+        x  = deadband(x) * 1.1;
         rx = deadband(rx);
 
         if (fieldRelative) {
-            // rotate inputs by heading so forward is always "away from driver"
-            double heading = hw.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            double heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             double cos = Math.cos(-heading);
             double sin = Math.sin(-heading);
             double rotX = x * cos - y * sin;
@@ -60,7 +57,6 @@ public class Drivetrain {
             y  = rotY;
         }
 
-        // mecanum wheel power equations
         double fl = (y + x + rx);
         double fr = (y - x - rx);
         double bl = (y - x + rx);
@@ -70,43 +66,25 @@ public class Drivetrain {
                          Math.max(Math.abs(fr),
                          Math.max(Math.abs(bl), Math.abs(br)))));
 
-        hw.frontLeft.setPower((fl / max) * speedMultiplier);
-        hw.frontRight.setPower((fr / max) * speedMultiplier);
-        hw.backLeft.setPower((bl / max) * speedMultiplier);
-        hw.backRight.setPower((br / max) * speedMultiplier);
+        flDrive.setPower((fl / max) * speedMultiplier);
+        frDrive.setPower((fr / max) * speedMultiplier);
+        blDrive.setPower((bl / max) * speedMultiplier);
+        brDrive.setPower((br / max) * speedMultiplier);
     }
 
-    // call this every loop before drive() to set speed
-    public void setSpeedMode(boolean slow, boolean turbo) {
-        if (slow) {
-            speedMultiplier = SPEED_SLOW;
-        } else if (turbo) {
-            speedMultiplier = SPEED_TURBO;
-        } else {
-            speedMultiplier = SPEED_NORMAL;
-        }
+    public void setSpeedMultiplier(boolean slow, boolean turbo) {
+        if (slow) speedMultiplier = SPEED_SLOW;
+        else if (turbo) speedMultiplier = SPEED_TURBO;
+        else speedMultiplier = SPEED_NORMAL;
     }
 
-    public double getSpeedMultiplier() {
-
-        return speedMultiplier;
-    }
-
-    public String getSpeedLabel() {
-        if (speedMultiplier <= SPEED_SLOW)  return "Slow (25%)";
-        if (speedMultiplier >= SPEED_TURBO) return "Turbo (100%)";
-        return "Normal (75%)";
-    }
-
-    public void stop() {
-        hw.frontLeft.setPower(0);
-        hw.frontRight.setPower(0);
-        hw.backLeft.setPower(0);
-        hw.backRight.setPower(0);
+    public String getSpeedMultiplier() {
+        if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (d%)", speedMultiplier);
+        if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (d%)", speedMultiplier);
+        return String.format("Normal (d%)", speedMultiplier);
     }
 
     private double deadband(double v) {
-
         return Math.abs(v) < STICK_DEADBAND ? 0 : v;
     }
 }
