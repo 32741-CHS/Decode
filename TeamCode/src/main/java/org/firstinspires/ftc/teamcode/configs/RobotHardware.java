@@ -22,10 +22,10 @@ public class RobotHardware {
 
     public void init(HardwareMap hardwareMap) {
         // drive motors
-        frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
-        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        backLeft   = hardwareMap.get(DcMotor.class, "backLeft");
-        backRight  = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft  = hardwareMap.get(DcMotor.class, "flDrive");
+        frontRight = hardwareMap.get(DcMotor.class, "frDrive");
+        backLeft   = hardwareMap.get(DcMotor.class, "blDrive");
+        backRight  = hardwareMap.get(DcMotor.class, "brDrive");
 
         // left side reversed, right side forward
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -38,7 +38,7 @@ public class RobotHardware {
         }
 
         // turret
-        lazySusan = hardwareMap.get(DcMotor.class, "lazySusan");
+        lazySusan = hardwareMap.get(DcMotor.class, "turret");
         lazySusan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // shooter
