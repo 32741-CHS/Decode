@@ -55,17 +55,20 @@ public class MainTeleOp extends OpMode {
         );
 
         if (gp1.y.wasPressed()) {
-            isFieldDriving = !isFieldDriving;}
-
-        if (gp1.lt >= TRIGGER_THRESHOLD) {intake.eat();}
-
-        if (gp1.rt >= TRIGGER_THRESHOLD) {shooter.shoot();}
+            isFieldDriving = !isFieldDriving;
+        }
 
         // gamepad 2
         if (gp2.dpadUp.wasPressed()) {shooter.speedUpFlywheel();}
         if (gp2.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
 
         if (gp2.y.wasPressed()) {drivetrain.resetIMU();}
+
+
+        if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
+
+        if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.shoot();}
+
         //TODO implement manual turret control
 
         intake.update();
