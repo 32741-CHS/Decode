@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 public class Feeder {
-    private static final double FEED_POWER = 0.4;
+    private static final double FEED_POWER = 1;
 
     private final DcMotor motor;
 
     public Feeder(RobotHardware hw) {
-        motor = hw.feederMotor;
+        motor = hw.feeder;
         motor.setDirection(DcMotorSimple.Direction.FORWARD);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }

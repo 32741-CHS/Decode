@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.configs;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -15,7 +13,7 @@ public class RobotHardware {
 
     public DcMotor lazySusan;
     public DcMotor flywheel;
-    public DcMotor feederMotor;
+    public DcMotor feeder;
     public DcMotor intake;
 
     public IMU imu;
@@ -35,7 +33,7 @@ public class RobotHardware {
         // shooter
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
 
-        feederMotor = hardwareMap.get(DcMotor.class, "feederMotor");
+        feeder = hardwareMap.get(DcMotor.class, "feeder");
 
         // intake
         intake = hardwareMap.get(DcMotor.class, "intake");
