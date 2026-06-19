@@ -13,6 +13,26 @@ import org.firstinspires.ftc.teamcode.subsystems.LazySusan;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
+/**
+ * Main TeleOp
+ *
+ * Controller 2 (Driver):
+ *   Left Stick    → drive + strafe
+ *   Right Stick X → rotate
+ *   RB (hold)     → slow mode (25%)
+ *   LB (hold)     → turbo mode (100%)
+ *   A (toggle)    → field-relative / robot-centric
+ *
+ * Controller 1 (Operator):
+ *   A (toggle)    → intake on/off
+ *   B (toggle)    → auto-shoot on/off
+ *   Right Trigger → flywheel speed (proportional) + feeder after 3s
+ *   D-pad Left    → spin susan left (hold)
+ *   D-pad Right   → spin susan right (hold)
+ *
+ * IMU: logo UP, USB FORWARD
+ * Webcam: "Webcam 1" on C920, 640x480, mounted on turret
+ */
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
 
