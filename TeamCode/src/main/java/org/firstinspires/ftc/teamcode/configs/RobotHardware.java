@@ -6,20 +6,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-
 // all hardware goes HERE!!! if wiring changes, only this file needs updating.
 public class RobotHardware {
 
-    public DcMotor frontLeft, frontRight, backLeft, backRight;
+    public DcMotor frontLeft;
+    public DcMotor frontRight;
+    public DcMotor backLeft;
+    public DcMotor backRight;
 
     public DcMotor lazySusan;
     public DcMotor flywheel;
     public DcMotor intake;
 
     public IMU imu;
-
-    public WebcamName vision;
 
     public void init(HardwareMap hardwareMap) {
         // drive motors
@@ -28,18 +27,36 @@ public class RobotHardware {
         backLeft   = hardwareMap.get(DcMotor.class, "blDrive");
         backRight  = hardwareMap.get(DcMotor.class, "brDrive");
 
+        // left side reversed, right side forward
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        for (DcMotor m : new DcMotor[]{frontLeft, frontRight, backLeft, backRight}) {
+            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
+
         // turret
         lazySusan = hardwareMap.get(DcMotor.class, "turret");
+        lazySusan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // shooter
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+        flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // intake
         intake = hardwareMap.get(DcMotor.class, "intake");
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // imu (change orientation based on final pos, but lowk have no clue where itll be)
         imu = hardwareMap.get(IMU.class, "imu");
-
-        vision = hardwareMap.get(WebcamName.class, "webcam");
+        imu.initialize(new IMU.Parameters(
+            new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+            )
+        ));
     }
 }

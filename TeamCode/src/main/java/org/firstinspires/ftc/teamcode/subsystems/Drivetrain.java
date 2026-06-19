@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.IMU;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
@@ -21,26 +16,9 @@ public class Drivetrain {
     private final RobotHardware hw;
     private double speedMultiplier = SPEED_NORMAL;
 
-
     public Drivetrain(RobotHardware hw) {
+
         this.hw = hw;
-
-        // left side reversed, right side forward
-        hw.frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        hw.backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        hw.frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        hw.backRight.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        for (DcMotor m : new DcMotor[]{hw.frontLeft, hw.frontRight, hw.backLeft, hw.backRight}) {
-            m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
-
-        hw.imu.initialize(new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        ));
     }
 
     // mecanum drive. pass in stick values and whether to use field relative mode
