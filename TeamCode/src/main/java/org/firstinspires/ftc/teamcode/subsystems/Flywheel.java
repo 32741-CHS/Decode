@@ -22,7 +22,7 @@ public class Flywheel {
     public Flywheel(RobotHardware hw) {
         this.hw = hw;
 
-        hw.flywheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        hw.flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         hw.flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
