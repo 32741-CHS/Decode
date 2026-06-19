@@ -15,6 +15,7 @@ public class RobotHardware {
 
     public DcMotor lazySusan;
     public DcMotor flywheel;
+    public DcMotor feederMotor;
     public DcMotor intake;
 
     public IMU imu;
@@ -33,6 +34,8 @@ public class RobotHardware {
 
         // shooter
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
+
+        feederMotor = hardwareMap.get(DcMotor.class, "feederMotor");
 
         // intake
         intake = hardwareMap.get(DcMotor.class, "intake");
