@@ -1,27 +1,33 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 public class Intake {
 
-    private final RobotHardware hw;
+    private final DcMotor intake;
+
+    private static double targetPower;
+    private static double desiredPower; //TODO find this
 
     public Intake(RobotHardware hw) {
-        this.hw = hw;
-        hw.intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake = hw.intake;
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    // power > 0 = out
-    // power < 0 = in
-    public void setPower(double power) {
-
-        hw.intake.setPower(power);
+    public void eat() {
+        targetPower = desiredPower;
     }
 
-    public void stop() {
+    public double getPower() {
+        return intake.getPower();
+    }
 
-        hw.intake.setPower(0);
+    public void update() {
+        intake.setPower(targetPower);
+        targetPower = 0;
     }
 }
