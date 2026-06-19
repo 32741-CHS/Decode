@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Feeder;
 import org.firstinspires.ftc.teamcode.subsystems.Flywheel;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.LazySusan;
+import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
@@ -42,7 +42,7 @@ public class MainTeleOp extends OpMode {
     private Drivetrain drivetrain;
     private Feeder feeder;
     private Intake intake;
-    private LazySusan susan;
+    private Turret turret;
     private Flywheel flywheel;
     private Vision vision;
 
@@ -64,7 +64,7 @@ public class MainTeleOp extends OpMode {
         drivetrain = new Drivetrain(hw);
         feeder = new Feeder(hw);
         intake = new Intake(hw);
-        susan = new LazySusan(hw);
+        turret = new Turret(hw);
         flywheel = new Flywheel(hw);
         vision = new Vision(hw);
 
@@ -99,19 +99,20 @@ public class MainTeleOp extends OpMode {
 
         // Flywheel toggle and speed
         if (gp1.b.wasPressed()) {
-            flywheel.setRunning(!flywheel.isRunning());
+            flywheel.toggleCanSpin();
         }
+
         if (gp1.dpadUp.wasPressed()) {
             flywheel.speedUp();
         }
         if (gp1.dpadDown.wasPressed()) {
-            flywheel.speedDown();
+            flywheel.slowDown();
         }
 
         // Right trigger: run feeder for 5 seconds on press
         boolean triggerPressed = gamepad1.right_trigger > TRIGGER_THRESHOLD;
         if (!feederRunning && triggerPressed && !triggerWasPressed) {
-            feeder.start();
+            feeder.feed();
             feederTimer.reset();
             feederRunning = true;
         }
@@ -124,21 +125,21 @@ public class MainTeleOp extends OpMode {
 
         // Turret manual
         if (gp1.dpadLeft.isHeld()) {
-            susan.setPower(-0.25);
+            turret.setPower(-0.25);
         } else if (gp1.dpadRight.isHeld()) {
-            susan.setPower(0.25);
+            turret.setPower(0.25);
         } else {
-            susan.setPower(0);
+            turret.setPower(0);
         }
 
         // Telemetry
         telemetry.addData("Intake", intakeOn ? "ON" : "OFF");
-        telemetry.addData("Flywheel", flywheel.getSpeedLabel());
+        telemetry.addData("Flywheel Power:", flywheel.getFlywheelPower());
         telemetry.addData("Feeder", feederRunning ? "ON" : "OFF");
         telemetry.addData("Feeder Timer", feederRunning ? String.format("%.1fs", feederTimer.seconds()) : "-");
         telemetry.addData("Drive", drivetrain.getSpeedLabel());
         telemetry.addData("Mode", fieldRelative ? "Field Relative" : "Robot Centric");
-        telemetry.addData("Susan", String.format("%.1f deg", susan.getAngle()));
+        telemetry.addData("Turret", String.format("%.1f deg", turret.getAngle()));
         telemetry.update();
     }
 
@@ -147,7 +148,7 @@ public class MainTeleOp extends OpMode {
         drivetrain.stop();
         feeder.stop();
         intake.stop();
-        susan.stop();
+        turret.stop();
         flywheel.stop();
         vision.stop();
     }
