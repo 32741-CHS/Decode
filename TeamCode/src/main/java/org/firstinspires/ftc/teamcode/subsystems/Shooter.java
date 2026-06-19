@@ -14,10 +14,10 @@ public class Shooter {
     private static double desiredFlywheelPower = 0.0;
     private static double desiredFeederPower;
 
-    private static double FLYWHEEL_FEEDER_DELAY = 1; // seconds
+    private static double FLYWHEEL_TO_FEEDER_DELAY = 1; // seconds
     private static ElapsedTime flywheelSpinTime = new ElapsedTime();
 
-    private boolean canFlywheelSpin, isFlywheelSpinning;
+    private boolean isFlywheelSpinning;
 
     public Shooter(RobotHardware hw) {
         flywheel = hw.flywheel;
@@ -28,16 +28,18 @@ public class Shooter {
         feeder = hw.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
         feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-        canFlywheelSpin = false;
-    }
-
-    public void toggleCanSpin() {
-        canFlywheelSpin = !canFlywheelSpin;
     }
 
     public double getFlywheelPower() {
         return flywheel.getPower();
+    }
+
+    public double getFeederPower() {
+        return feeder.getPower();
+    }
+
+    public double getTimeTillFeeder() {
+        return Math.min(FLYWHEEL_TO_FEEDER_DELAY - flywheelSpinTime.seconds(), 0.0);
     }
 
     public void speedUpFlywheel() {
@@ -55,10 +57,10 @@ public class Shooter {
     }
 
     public void update() {
-        flywheel.setPower(canFlywheelSpin ? targetFlywheelPower : 0);
+        flywheel.setPower(targetFlywheelPower);
         isFlywheelSpinning = (targetFlywheelPower != 0);
 
-        if (flywheelSpinTime.seconds() >= FLYWHEEL_FEEDER_DELAY) {feeder.setPower(targetFeederPower);}
+        if (flywheelSpinTime.seconds() >= FLYWHEEL_TO_FEEDER_DELAY) {feeder.setPower(targetFeederPower);}
 
         targetFlywheelPower = 0; targetFeederPower = 0;
     }

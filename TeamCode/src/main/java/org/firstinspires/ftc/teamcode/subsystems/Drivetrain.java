@@ -34,12 +34,7 @@ public class Drivetrain {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
-        hw.imu.initialize(new IMU.Parameters( // TODO update these
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        ));
+        resetIMU();
     }
 
     public void drive(double y, double x, double rx, boolean fieldRelative) {
@@ -82,6 +77,15 @@ public class Drivetrain {
         if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (d%)", speedMultiplier);
         if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (d%)", speedMultiplier);
         return String.format("Normal (d%)", speedMultiplier);
+    }
+
+    public void resetIMU() {
+        imu.initialize(new IMU.Parameters( // TODO update these
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                )
+        ));
     }
 
     private double deadband(double v) {
