@@ -15,7 +15,7 @@ public class Shooter {
     private final DcMotorEx flywheel;
     private final DcMotor feeder;
 
-    public static double STEP_AMOUNT = 1;
+public static double STEP_AMOUNT = 1;
     private static double targetFeederPower;
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;
@@ -26,6 +26,8 @@ public class Shooter {
     public static double kF = 14;
 
     public static double FLYWHEEL_ERROR_TOLERANCE = 1;
+
+    public static boolean canSpinFlywheel = true;
 
     private boolean isFlywheelSpinning;
 
@@ -61,6 +63,10 @@ public class Shooter {
         return getFlywheelRPS() - desiredFlywheelRPS;
     }
 
+    public void toggleFlywheel() {
+        canSpinFlywheel = !canSpinFlywheel;
+    }
+
     public void feed() {
         targetFeederPower = desiredFeederPower;
     }
@@ -69,7 +75,7 @@ public class Shooter {
         flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(kP, 0, 0, kF));
 
-        flywheel.setVelocity(desiredFlywheelRPS * GOBILDA_5203_6000RPM);
+        flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
         if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOLERANCE) {
             feeder.setPower(targetFeederPower);
