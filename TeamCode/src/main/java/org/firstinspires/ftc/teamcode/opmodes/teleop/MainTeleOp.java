@@ -70,6 +70,7 @@ public class MainTeleOp extends OpMode {
         if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
 
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
+        if (gp2.a.isHeld()) { intake.invert();}
 
         //TODO implement manual turret control
 
