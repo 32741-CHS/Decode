@@ -78,9 +78,9 @@ public class MainTeleOp extends OpMode {
         shooter.update();
 
         // Telemetry
-        telemetry.addData("Intake power:",  intake.getPower());
-        telemetry.addData("Feeder power:", shooter.getFeederPower());
+        telemetry.addData("Intake power",  intake.getPower());
+        telemetry.addData("Feeder power", shooter.getFeederPower());
         telemetry.addLine(String.format("Flywheel rps: %.2f, error: %.2f", shooter.getFlywheelRPS(), shooter.getFlywheelErrorRPS()));
-        //telemetry.addLine(String.format("Driving Mode: %s, Driving Speed: %s", isFieldDriving ? "field" : "robot", drivetrain.getSpeedMultiplier()));
+        telemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
     }
 }
