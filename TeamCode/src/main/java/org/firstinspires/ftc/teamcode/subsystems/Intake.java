@@ -12,7 +12,7 @@ public class Intake {
     private final DcMotor intake;
 
     private static double targetPower;
-    public static double desiredPower = 0.0; //TODO find this
+    public static double desiredPower = 0.7;
 
     public Intake(RobotHardware hw) {
         intake = hw.intake;
