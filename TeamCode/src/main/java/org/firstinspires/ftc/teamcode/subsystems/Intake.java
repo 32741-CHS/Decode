@@ -12,7 +12,9 @@ public class Intake {
     private final DcMotor intake;
 
     private static double targetPower;
-    public static double desiredPower = 0.7;
+    public static double desiredPower = 1;
+
+    public static boolean isInverted = false;
 
     public Intake(RobotHardware hw) {
         intake = hw.intake;
@@ -27,9 +29,11 @@ public class Intake {
     public double getPower() {
         return intake.getPower();
     }
+    public void invert() { isInverted = true; }
 
     public void update() {
-        intake.setPower(targetPower);
+        intake.setPower(!isInverted ? targetPower : -targetPower);
         targetPower = 0;
+        isInverted = false;
     }
 }
