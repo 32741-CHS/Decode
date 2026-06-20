@@ -22,7 +22,8 @@ public static double STEP_AMOUNT = 1;
 
     private static double MAX_FLYWHEEL_RPS = 100;
 
-    public static double kP = 4;
+    public static boolean forceFeed = false;
+    public static double kP = 6.5;
     public static double kF = 14;
 
     public static double FLYWHEEL_ERROR_TOLERANCE = 1;
@@ -77,10 +78,10 @@ public static double STEP_AMOUNT = 1;
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
-        if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOLERANCE) {
+        if (Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOLERANCE || forceFeed) {
             feeder.setPower(targetFeederPower);
         }
 
-        targetFeederPower = 0;
+        targetFeederPower = 0; forceFeed = false;
     }
 }
