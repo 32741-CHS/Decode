@@ -41,7 +41,7 @@ public static double STEP_AMOUNT = 1;
 
         feeder = hw.feeder;
         feeder.setDirection(DcMotorSimple.Direction.FORWARD);
-        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        feeder.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public double getFlywheelRPS() {
