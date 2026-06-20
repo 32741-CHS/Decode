@@ -67,7 +67,7 @@ public class MainTeleOp extends OpMode {
 
         if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
 
-        if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.shoot();}
+        if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
 
         //TODO implement manual turret control
 
