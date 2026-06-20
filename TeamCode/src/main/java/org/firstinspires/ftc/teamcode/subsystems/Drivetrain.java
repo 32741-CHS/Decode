@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -11,11 +13,19 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 public class Drivetrain {
 
+    static final double WHEEL_DIAMETER = 10.4;
+    static final double COUNTS_PER_CM = GOBILDA_5203_312RPM / (WHEEL_DIAMETER * Math.PI);
+
     private static final double SPEED_SLOW   = 0.25;
     private static final double SPEED_NORMAL = 0.75;
     private static final double SPEED_TURBO  = 1.00;
 
     private static final double STICK_DEADBAND = 0.05;
+
+    public static double AUTO_TURN_SPEED = 0.5;
+    public static double AUTO_DRIVE_SPEED = 0.4;
+
+    public static double HEADING_TOLERANCE = 3;
 
     private final DcMotor flDrive, frDrive, blDrive, brDrive;
     private final IMU imu;
@@ -32,6 +42,8 @@ public class Drivetrain {
 
         for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
             m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
 
         resetIMU();
@@ -73,11 +85,11 @@ public class Drivetrain {
         else speedMultiplier = SPEED_NORMAL;
     }
 
-    //public String getSpeedMultiplier() {
-    //    if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (d%)", speedMultiplier);
-    //    if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (d%)", speedMultiplier);
-    //    return String.format("Normal (d%)", speedMultiplier);
-    //}
+    public String getSpeedMultiplier() {
+        if (speedMultiplier <= SPEED_SLOW)  return String.format("Slow (%.0f%%)", speedMultiplier * 100);
+        if (speedMultiplier >= SPEED_TURBO) return String.format("Turbo (%.0f%%)", speedMultiplier * 100);
+       return String.format("Normal (%.0f%%)", speedMultiplier * 100);
+    }
 
     public void resetIMU() {
         imu.initialize(new IMU.Parameters( // TODO update these
@@ -91,4 +103,31 @@ public class Drivetrain {
     private double deadband(double v) {
         return Math.abs(v) < STICK_DEADBAND ? 0 : v;
     }
+
+    public void stop() {
+        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
+            m.setPower(0);
+        }
+    }
+
+    public void driveDistance(double distance) {
+        int target = (int)(distance * COUNTS_PER_CM);
+
+        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
+            m.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            m.setTargetPosition(target);
+            m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            m.setPower(AUTO_DRIVE_SPEED);
+        }
+
+        while (flDrive.isBusy()) {} // find a better way to do this maybe
+
+        for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
+            m.setPower(0);
+            m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+    }
+
+
+
 }
