@@ -74,6 +74,7 @@ public class MainTeleOp extends OpMode {
         if (gp2.dpadDown.wasPressed()) {shooter.slowDownFlywheel();}
 
         if (gp2.y.wasPressed()) {drivetrain.resetIMU();}
+        if (gp2.b.wasPressed()) {turret.resetTurretEncoder();}
 
         if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
         if (gp2.a.isHeld()) { intake.invert();}
@@ -85,6 +86,7 @@ public class MainTeleOp extends OpMode {
 
         intake.update();
         shooter.update();
+        turret.update();
 
         // Telemetry
         telemetry.addData("Intake power",  intake.getPower());
