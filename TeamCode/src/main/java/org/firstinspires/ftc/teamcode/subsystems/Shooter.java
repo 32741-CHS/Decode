@@ -71,6 +71,7 @@ public static double STEP_AMOUNT = 1;
     public void feed() {
         targetFeederPower = desiredFeederPower;
     }
+    public void enableForceFeed() {forceFeed = true;}
 
     public void update() {
         flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
