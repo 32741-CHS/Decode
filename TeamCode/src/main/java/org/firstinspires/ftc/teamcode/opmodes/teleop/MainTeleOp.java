@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.bylazar.gamepad.GamepadManager;
+import com.bylazar.gamepad.PanelsGamepad;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.bylazar.graph.PanelsGraph;
+import com.bylazar.graph.GraphManager;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,11 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
-
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
-import com.bylazar.graph.PanelsGraph;
-import com.bylazar.graph.GraphManager;
 
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
@@ -25,13 +27,15 @@ public class MainTeleOp extends OpMode {
     private Shooter shooter;
     private Turret turret;
 
+    private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
 
-    private boolean isFieldDriving = false;
+    private final GamepadManager pgp1 = PanelsGamepad.INSTANCE.getFirstManager();
+    private final GamepadManager pgp2 = PanelsGamepad.INSTANCE.getSecondManager();
 
-    private TelemetryManager panelsTelemetry;
-    private GraphManager panelsGraph;
+    private boolean isFieldDriving = false;
 
     private static final double TRIGGER_THRESHOLD = 0.5;
 
@@ -44,17 +48,18 @@ public class MainTeleOp extends OpMode {
         shooter = new Shooter(hw);
         turret = new Turret(hw);
 
-        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-        panelsGraph = PanelsGraph.INSTANCE.getManager();
-
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
 
     @Override
+    public void start() {
+        turret.resetTimer();
+    }
+    @Override
     public void loop() {
-        gp1.update(gamepad1);
-        gp2.update(gamepad2);
+        gp1.update(pgp1.asCombinedFTCGamepad(gamepad1));
+        gp2.update(pgp2.asCombinedFTCGamepad(gamepad2));
 
         // gamepad 1
         drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
@@ -89,10 +94,13 @@ public class MainTeleOp extends OpMode {
         turret.update();
 
         // Telemetry
-        telemetry.addData("Intake power",  intake.getPower());
-        telemetry.addData("Feeder power", shooter.getFeederPower());
-        telemetry.addLine(String.format("Flywheel rps: %.2f, error: %.2f", shooter.getFlywheelRPS(), shooter.getFlywheelErrorRPS()));
-        telemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
+        panelsTelemetry.addData("Intake power",  intake.getPower());
+        panelsTelemetry.addData("Feeder power", shooter.getFeederPower());
+        panelsTelemetry.addData("Flywheel rps", shooter.getFlywheelRPS());
+        panelsTelemetry.addData("Flywheel error", shooter.getFlywheelErrorRPS());
+        panelsTelemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
+        panelsTelemetry.addData("Turret angle", turret.getCurrentAngle());
+        panelsTelemetry.addData("Turret error", turret.getErrorAngle());
 
         // panels graph feed
         panelsGraph.addData("flywheelRPS", shooter.getFlywheelRPS());
