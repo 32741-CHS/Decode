@@ -33,7 +33,6 @@ public class Intake {
 
     public void update() {
         intake.setPower(!isInverted ? targetPower : -targetPower);
-        targetPower = 0;
-        isInverted = false;
+        targetPower = 0; isInverted = false;
     }
 }
