@@ -17,7 +17,9 @@ public class Turret {
 
     public static double desiredAngle;
 
-    public static double kP, kD, kV, kS;
+    public static double kD, kV;
+    public static double kS = 0.057;
+    public static double kP = 0.15;
 
     private ElapsedTime timer = new ElapsedTime();
     private double lastError = 0;
@@ -27,8 +29,8 @@ public class Turret {
 
     public static double ANGLE_TOLERANCE = 0.2;
 
-    public static double MIN_ANGLE = -55;
-    public static double MAX_ANGLE = 55;
+    public static double MIN_ANGLE = -44;
+    public static double MAX_ANGLE = 20;
 
     public Turret(RobotHardware hw) {
         turret = hw.turret;
