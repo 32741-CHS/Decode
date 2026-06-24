@@ -15,7 +15,7 @@ public class Shooter {
     private final DcMotorEx flywheel;
     private final DcMotor feeder;
 
-public static double STEP_AMOUNT = 1;
+    public static double STEP_AMOUNT = 1;
     private static double targetFeederPower;
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;

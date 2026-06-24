@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
@@ -19,6 +20,8 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Shooter shooter;
     private Turret turret;
+    private Vision vision;
+    private int ourGoalTagId;
 
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
@@ -26,6 +29,9 @@ public class MainTeleOp extends OpMode {
     private boolean isFieldDriving = false;
 
     private static final double TRIGGER_THRESHOLD = 0.5;
+    private static final boolean AUTO_AIM = false;
+    private static final boolean isRedAlliance = false;
+
 
     @Override
     public void init() {
@@ -35,7 +41,9 @@ public class MainTeleOp extends OpMode {
         intake = new Intake(hw);
         shooter = new Shooter(hw);
         turret = new Turret(hw);
+        vision = new Vision(hw);
 
+        ourGoalTagId = vision.getGoalTagId(isRedAlliance);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -44,6 +52,9 @@ public class MainTeleOp extends OpMode {
     public void loop() {
         gp1.update(gamepad1);
         gp2.update(gamepad2);
+        intake.update();
+        shooter.update();
+        turret.update();
 
         // gamepad 1
         drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
@@ -70,10 +81,10 @@ public class MainTeleOp extends OpMode {
         if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
 
-        //TODO implement manual turret control
-
-        intake.update();
-        shooter.update();
+        //
+        if (AUTO_AIM){
+            turret.pointTurret(turret.getCurrentBearingRadians() + vision.getTagBearingRadians(ourGoalTagId));
+        }
 
         // Telemetry
         telemetry.addData("Intake power",  intake.getPower());

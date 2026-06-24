@@ -19,8 +19,8 @@ import java.util.List;
 // 20 (blue), 24 (red)
 public class Vision {
     private final RobotHardware hw;
-    private AprilTagProcessor processor;
-    private VisionPortal portal;
+    private final AprilTagProcessor processor;
+    private final VisionPortal portal;
 
     public static final int BLUE_GOAL_TAG = 20;
     public static final int RED_GOAL_TAG = 24;
@@ -35,7 +35,7 @@ public class Vision {
                 .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
                 .build();
 
-        // idk change
+        // Changes image detail to make the code run faster. 1 is high detail, 3 is low, 2 is a middle ground
         processor.setDecimation(2);
 
         portal = new VisionPortal.Builder()
@@ -55,12 +55,12 @@ public class Vision {
         return getTagById(tagId) != null;
     }
 
-    // get bearing (in degrees) to a goal tag
+    // get bearing (in ??) to a goal tag
     // returns 0 if tag not visible.
-    public double getTagBearing(int tagId) {
+    public double getTagBearingRadians(int tagId) {
         AprilTagDetection tag = getTagById(tagId);
-        if (tag == null) return 0;
-        return Math.toDegrees(tag.ftcPose.bearing);
+        if (tag == null || tag.ftcPose == null) return 0.0; // If data is corrupted or not good
+        return tag.ftcPose.bearing;
     }
 
     public double getTagRange(int tagId) {
