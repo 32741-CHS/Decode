@@ -14,7 +14,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 
-// DECODE season: 20 = blue goal, 24 = red goal
+// 20 = blue goal, 24 = red goal
 public class Vision {
     private AprilTagProcessor processor;
     private VisionPortal portal;
@@ -44,7 +44,6 @@ public class Vision {
         PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);
     }
 
-    // call this every loop to refresh detections
     public List<AprilTagDetection> getDetections() {
         return processor.getDetections();
     }
@@ -54,7 +53,6 @@ public class Vision {
         return getTagById(tagId) != null;
     }
 
-    // get bearing (in degrees) to a goal tag
     // returns 0 if tag not visible.
     public double getTagBearing(int tagId) {
         AprilTagDetection tag = getTagById(tagId);
@@ -74,7 +72,6 @@ public class Vision {
         return Math.toDegrees(tag.ftcPose.yaw);
     }
 
-    // find a specific tag from current detections
     public AprilTagDetection getTagById(int tagId) {
         List<AprilTagDetection> detections = getDetections();
         for (AprilTagDetection detection : detections) {
@@ -86,7 +83,7 @@ public class Vision {
     }
 
     // get the goal tag ID based on alliance color
-    // TODO: we need to have a way to set alliance (manual for now)
+    // TODO: we need to have a way to set alliance (manual for now via controller)
     public int getGoalTagId(boolean isRedAlliance) {
         return isRedAlliance ? RED_GOAL_TAG : BLUE_GOAL_TAG;
     }
