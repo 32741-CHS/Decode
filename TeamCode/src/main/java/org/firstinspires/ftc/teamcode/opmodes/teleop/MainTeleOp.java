@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
+import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
@@ -19,6 +20,7 @@ public class MainTeleOp extends OpMode {
     private Intake intake;
     private Shooter shooter;
     private Turret turret;
+    private Vision vision;
 
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
@@ -35,6 +37,7 @@ public class MainTeleOp extends OpMode {
         intake = new Intake(hw);
         shooter = new Shooter(hw);
         turret = new Turret(hw);
+        vision = new Vision(hw);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -69,6 +72,16 @@ public class MainTeleOp extends OpMode {
 
         if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
+
+        // TODO: make this automatic every loop once the table has data
+        // for now it just sets speed once on button press
+        if (gp2.b.wasPressed()) {
+            double d = vision.getTagRange(vision.getGoalTagId(false));
+            if (d >= 0) {
+                shooter.setTargetFromTable(d);
+                telemetry.addData("Auto target (m)", d);
+            }
+        }
 
         //TODO implement manual turret control
 

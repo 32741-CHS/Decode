@@ -73,6 +73,10 @@ public static double STEP_AMOUNT = 1;
     }
     public void enableForceFeed() {forceFeed = true;}
 
+    public void setTargetFromTable(double distance) {
+        desiredFlywheelRPS = DistanceRPSMap.getRPS(distance);
+    }
+
     public void update() {
         flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,
                 new PIDFCoefficients(kP, 0, 0, kF));
