@@ -11,9 +11,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
-// TODO: replace this whole class with pedro pathing follower + odometry
-// pedro pathing will handle teleop driving, auto path following, and
-// give us robot pose (x, y, heading) for the shooter lookup table
 public class Drivetrain {
 
     static final double WHEEL_DIAMETER = 10.4;

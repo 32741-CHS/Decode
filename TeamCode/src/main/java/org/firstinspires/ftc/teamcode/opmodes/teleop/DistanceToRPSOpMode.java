@@ -13,7 +13,9 @@ import org.firstinspires.ftc.teamcode.subsystems.Vision;
 import java.util.ArrayList;
 import java.util.List;
 
-// use this to build the distance -> rps lookup table.
+// thx claude (i made a new account lols) :)
+
+// temp opmode to make lookup table.
 // 1. place robot at measured distance from goal
 // 2. adjust flywheel rps until shots go in
 // 3. press a to record the pair
@@ -97,7 +99,7 @@ public class DistanceToRPSOpMode extends LinearOpMode {
             }
 
             telemetry.addLine();
-            telemetry.addLine("copy this into ballistics.java:");
+            telemetry.addLine("copy this:");
             telemetry.addLine("{ " + formatTable() + " }");
 
             telemetry.update();
@@ -107,7 +109,7 @@ public class DistanceToRPSOpMode extends LinearOpMode {
     }
 
     private String formatTable() {
-        if (recordedPoints.isEmpty()) return "empty — record some shots first";
+        if (recordedPoints.isEmpty()) return "nothing, record some shots first";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < recordedPoints.size(); i++) {
             double[] pt = recordedPoints.get(i);

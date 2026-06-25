@@ -14,24 +14,17 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 public class Turret {
 
     private final DcMotorEx turret;
-    // friction wheel ratio: wheel diameter / lazy susan diameter
+    // TODO: wheel diameter / lazy susan diameter
     private final static double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
 
     public static double desiredAngle;
-
-    // pid + feedforward gains
     public static double kP = 0.03;
     public static double kF = 0.04;
     public static double MAX_POWER = 0.6;
-    // how fast power can change per update cycle (prevents jerk)
     public static double MAX_ACCEL = 0.02;
-    // stop correcting when within this many degrees
     public static double ANGLE_TOLERANCE = 1.5;
-
-    // software limits
     public static double MIN_ANGLE = -44;
     public static double MAX_ANGLE = 20;
-    // within this distance from a limit, start slowing down
     public static double SOFT_ZONE_DEG = 5.0;
 
     private double lastPower = 0;
@@ -66,22 +59,18 @@ public class Turret {
         double currentAngle = getCurrentAngle();
         double error = getErrorAngle();
 
-        // deadband — close enough, stop
         if (Math.abs(error) < ANGLE_TOLERANCE) {
             turret.setPower(0);
             lastPower = 0;
             return;
         }
 
-        // proportional term
         double p = kP * error;
 
-        // friction breakaway — constant power in the direction we need to go
         double ff = Math.copySign(kF, error);
 
         double rawPower = p + ff;
 
-        // soft-zone limiting: slow down near angle limits
         double distToMin = currentAngle - MIN_ANGLE;
         double distToMax = MAX_ANGLE - currentAngle;
         double speedLimit = MAX_POWER;
@@ -96,7 +85,6 @@ public class Turret {
 
         double clipped = Range.clip(rawPower, -speedLimit, speedLimit);
 
-        // acceleration limiting: smooth ramp, no jerking
         double delta = clipped - lastPower;
         delta = Range.clip(delta, -MAX_ACCEL, MAX_ACCEL);
         double power = lastPower + delta;

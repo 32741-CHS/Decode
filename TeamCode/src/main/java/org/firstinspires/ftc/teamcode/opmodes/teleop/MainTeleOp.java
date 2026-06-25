@@ -46,6 +46,9 @@ public class MainTeleOp extends OpMode {
     public static boolean isRed = false;
 
     private static final double TRIGGER_THRESHOLD = 0.5;
+    private static final double STICK_DEADBAND = 0.15;
+    private boolean turretManualMode = false;
+    private double manualTurretAngle = 0;
 
     @Override
     public void init() {
@@ -108,12 +111,24 @@ public class MainTeleOp extends OpMode {
         if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
 
-        // auto-aim: track the goal tag with the turret
+        // turret: right stick x for manual override, or auto-track the goal tag
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
-        if (goalTag != null) {
-            double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
-            double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
-            turret.goTo(angle);
+
+        double stickX = gamepad2.right_stick_x;
+        if (Math.abs(stickX) > STICK_DEADBAND) {
+            if (!turretManualMode) {
+                turretManualMode = true;
+                manualTurretAngle = turret.getCurrentAngle();
+            }
+            manualTurretAngle += stickX * 3;
+            turret.goTo(manualTurretAngle);
+        } else {
+            turretManualMode = false;
+            if (goalTag != null) {
+                double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
+                double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
+                turret.goTo(angle);
+            }
         }
 
         intake.update();
@@ -128,6 +143,15 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
         panelsTelemetry.addData("Turret angle", turret.getCurrentAngle());
         panelsTelemetry.addData("Turret error", turret.getErrorAngle());
+        panelsTelemetry.addData("Turret mode", turretManualMode ? "MANUAL" : "AUTO");
+
+        if (goalTag != null) {
+            panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));
+            panelsTelemetry.addData("Tag bearing", String.format("%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
+            panelsTelemetry.addData("Suggested RPS", Ballistics.getFlywheelRPS(goalTag.ftcPose.range));
+        } else {
+            panelsTelemetry.addData("Tag distance", "no tag");
+        }
 
         // panels graph feed
         panelsGraph.addData("flywheelRPS", shooter.getFlywheelRPS());
