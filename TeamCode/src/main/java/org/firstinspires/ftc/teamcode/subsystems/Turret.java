@@ -4,7 +4,8 @@ import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312R
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
@@ -12,25 +13,28 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 @Configurable
 public class Turret {
 
-    private final DcMotor turret;
+    private final DcMotorEx turret;
+    // friction wheel ratio: wheel diameter / lazy susan diameter
     private final static double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
 
     public static double desiredAngle;
 
-    public static double kD;
-    public static double kS = 0.057;
-    public static double kP = 0.15;
+    // pid + feedforward gains
+    public static double kP = 0.03;
+    public static double kF = 0.04;
+    public static double MAX_POWER = 0.6;
+    // how fast power can change per update cycle (prevents jerk)
+    public static double MAX_ACCEL = 0.02;
+    // stop correcting when within this many degrees
+    public static double ANGLE_TOLERANCE = 1.5;
 
-    private ElapsedTime timer = new ElapsedTime();
-    private double lastError;
-
-    public static double MAX_POWER = 0.8;
-    private double power = 0;
-
-    public static double ANGLE_TOLERANCE = 0.2;
-
+    // software limits
     public static double MIN_ANGLE = -44;
     public static double MAX_ANGLE = 20;
+    // within this distance from a limit, start slowing down
+    public static double SOFT_ZONE_DEG = 5.0;
+
+    private double lastPower = 0;
 
     public Turret(RobotHardware hw) {
         turret = hw.turret;
@@ -48,48 +52,56 @@ public class Turret {
         return desiredAngle - getCurrentAngle();
     }
 
-    public void resetTimer() {
-        timer.reset();
+    public void goTo(double angle) {
+        desiredAngle = Range.clip(angle, MIN_ANGLE, MAX_ANGLE);
     }
 
-    public void goTo(double angle) {
-        desiredAngle = angle;
-    }
     public void resetTurretEncoder() {
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        desiredAngle = 0;
+    }
 
     public void update() {
-        double deltaTime = timer.seconds();
+        double currentAngle = getCurrentAngle();
         double error = getErrorAngle();
 
-        double sTerm = Math.copySign(kS, error);
-
-        double pTerm = error * kP;
-
-        double currentAngle = getCurrentAngle();
-
-        double dTerm = 0; //double vTerm = 0;
-        if (deltaTime > 0) {
-            dTerm = (error - lastError) / deltaTime * kD;
-
-        //    double setpointVelocity = (desiredAngle - lastDesiredAngle) / deltaTime;
-        //    vTerm = setpointVelocity * kV;
-        }
-
-        double combinedTerm = sTerm + pTerm + dTerm;
-
+        // deadband — close enough, stop
         if (Math.abs(error) < ANGLE_TOLERANCE) {
-            power = 0;
-        } else {
-            power = Range.clip(combinedTerm, -MAX_POWER, MAX_POWER);
+            turret.setPower(0);
+            lastPower = 0;
+            return;
         }
 
-        if (power > 0 && currentAngle >= MAX_ANGLE) {power = 0;}
-        else if (power < 0 && currentAngle <= MIN_ANGLE) {power = 0;}
+        // proportional term
+        double p = kP * error;
+
+        // friction breakaway — constant power in the direction we need to go
+        double ff = Math.copySign(kF, error);
+
+        double rawPower = p + ff;
+
+        // soft-zone limiting: slow down near angle limits
+        double distToMin = currentAngle - MIN_ANGLE;
+        double distToMax = MAX_ANGLE - currentAngle;
+        double speedLimit = MAX_POWER;
+
+        if (error < 0 && distToMin < SOFT_ZONE_DEG) {
+            // moving toward minimum limit
+            speedLimit *= Math.max(0.1, distToMin / SOFT_ZONE_DEG);
+        } else if (error > 0 && distToMax < SOFT_ZONE_DEG) {
+            // moving toward maximum limit
+            speedLimit *= Math.max(0.1, distToMax / SOFT_ZONE_DEG);
+        }
+
+        double clipped = Range.clip(rawPower, -speedLimit, speedLimit);
+
+        // acceleration limiting: smooth ramp, no jerking
+        double delta = clipped - lastPower;
+        delta = Range.clip(delta, -MAX_ACCEL, MAX_ACCEL);
+        double power = lastPower + delta;
 
         turret.setPower(power);
-        lastError = error;
-        timer.reset();
+        lastPower = power;
     }
-
 }

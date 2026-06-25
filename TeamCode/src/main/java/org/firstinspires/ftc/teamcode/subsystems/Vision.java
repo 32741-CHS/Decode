@@ -14,7 +14,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 
-// 20 (blue), 24 (red)
+// DECODE season: 20 = blue goal, 24 = red goal
 public class Vision {
     private AprilTagProcessor processor;
     private VisionPortal portal;
@@ -38,7 +38,7 @@ public class Vision {
                 .addProcessor(processor)
                 .build();
 
-        // idk change
+        // TODO: tune exposure with ConceptAprilTagOptimizeExposure
         processor.setDecimation(2);
 
         PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);

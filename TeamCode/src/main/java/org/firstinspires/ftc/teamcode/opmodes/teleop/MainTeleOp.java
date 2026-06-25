@@ -58,13 +58,24 @@ public class MainTeleOp extends OpMode {
         turret = new Turret(hw);
 
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("Alliance", "START+A = Red, START+B = Blue");
         telemetry.update();
     }
 
     @Override
-    public void start() {
-        turret.resetTimer();
+    public void init_loop() {
+        if (gamepad1.start && gamepad1.a) {
+            isRed = true;
+        } else if (gamepad1.start && gamepad1.b) {
+            isRed = false;
+        }
+        telemetry.addData("Alliance", isRed ? "RED" : "BLUE");
+        telemetry.addData("Controls", "Hold START + A (Red) or B (Blue)");
+        telemetry.update();
     }
+
+    @Override
+    public void start() {}
     @Override
     public void loop() {
         gp1.update(pgp1.asCombinedFTCGamepad(gamepad1));
@@ -72,6 +83,7 @@ public class MainTeleOp extends OpMode {
 
         // gamepad 1
         drivetrain.setSpeedMultiplier(gp1.lb.isHeld(), gp1.rb.isHeld());
+        // TODO: replace with follower.setTeleOpDrive() once pedro is added
         drivetrain.drive(
             -gamepad1.left_stick_y,
             gamepad1.left_stick_x,
@@ -96,9 +108,11 @@ public class MainTeleOp extends OpMode {
         if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
 
+        // auto-aim: track the goal tag with the turret
         AprilTagDetection goalTag = vision.getTagById(isRed ? RED_GOAL : BLUE_GOAL);
         if (goalTag != null) {
-            double angle = Ballistics.calculateTurretAngle(goalTag.ftcPose.yaw, turret.getCurrentAngle());
+            double bearing = Math.toDegrees(goalTag.ftcPose.bearing);
+            double angle = Ballistics.calculateTurretAngle(bearing, turret.getCurrentAngle());
             turret.goTo(angle);
         }
 
