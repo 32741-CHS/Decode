@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import android.util.Size;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.robot.Robot;
+import com.bylazar.camerastream.PanelsCameraStream;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
@@ -18,15 +16,14 @@ import java.util.List;
 
 // 20 (blue), 24 (red)
 public class Vision {
-    private final RobotHardware hw;
     private AprilTagProcessor processor;
     private VisionPortal portal;
 
     public static final int BLUE_GOAL_TAG = 20;
     public static final int RED_GOAL_TAG = 24;
 
+    public static int MAX_FPS = 15;
     public Vision(RobotHardware hw) {
-        this.hw = hw;
         processor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
@@ -35,14 +32,16 @@ public class Vision {
                 .setOutputUnits(DistanceUnit.METER, AngleUnit.RADIANS)
                 .build();
 
-        // idk change
-        processor.setDecimation(2);
-
         portal = new VisionPortal.Builder()
                 .setCamera(hw.vision)
                 .setCameraResolution(new Size(640, 480))
                 .addProcessor(processor)
                 .build();
+
+        // idk change
+        processor.setDecimation(2);
+
+        PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);
     }
 
     // call this every loop to refresh detections
