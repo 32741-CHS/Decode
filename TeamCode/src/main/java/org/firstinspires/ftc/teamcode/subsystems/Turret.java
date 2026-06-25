@@ -2,12 +2,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
-
+import org.firstinspires.ftc.teamcode.configs.TickRates;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 // encoder resets on init so center = 0 degrees.
 public class Turret {
-
+    private final double GEAR_RATIO = 1;
     private final DcMotor turret;
     private double desiredBearing = 0;
     public double currentBearing = 0;
@@ -18,7 +18,7 @@ public class Turret {
     // Constant that dictates how fast motor move based on err
     private final double ROTATIONAL_SPEED = 0.1;
     // ↓↓↓ This is the thing that is dependent on the motor to convert to degrees
-    private final double TICKS_PER_REVOLUTION = 537.7;
+    private final double TICKS_PER_REVOLUTION = TickRates.GOBILDA_5203_312RPM * GEAR_RATIO; // We do not know with the gear ratio do we...
 
 
     public Turret(RobotHardware hw) {

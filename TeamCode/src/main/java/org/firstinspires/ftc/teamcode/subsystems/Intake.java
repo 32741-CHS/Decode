@@ -10,12 +10,9 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 public class Intake {
 
     private final DcMotor intake;
-
     private static double targetPower;
     public static double desiredPower = 1;
-
     public static boolean isInverted = false;
-
     public Intake(RobotHardware hw) {
         intake = hw.intake;
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
