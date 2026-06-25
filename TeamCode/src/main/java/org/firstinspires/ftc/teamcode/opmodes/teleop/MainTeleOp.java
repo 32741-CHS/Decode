@@ -10,6 +10,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.Turret;
 import org.firstinspires.ftc.teamcode.utils.GamepadEx;
 
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.bylazar.graph.PanelsGraph;
+import com.bylazar.graph.GraphManager;
+
 @TeleOp(name = "Main TeleOp", group = "TeleOp")
 public class MainTeleOp extends OpMode {
 
@@ -25,6 +30,9 @@ public class MainTeleOp extends OpMode {
 
     private boolean isFieldDriving = false;
 
+    private TelemetryManager panelsTelemetry;
+    private GraphManager panelsGraph;
+
     private static final double TRIGGER_THRESHOLD = 0.5;
 
     @Override
@@ -35,6 +43,9 @@ public class MainTeleOp extends OpMode {
         intake = new Intake(hw);
         shooter = new Shooter(hw);
         turret = new Turret(hw);
+
+        panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
+        panelsGraph = PanelsGraph.INSTANCE.getManager();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -80,5 +91,15 @@ public class MainTeleOp extends OpMode {
         telemetry.addData("Feeder power", shooter.getFeederPower());
         telemetry.addLine(String.format("Flywheel rps: %.2f, error: %.2f", shooter.getFlywheelRPS(), shooter.getFlywheelErrorRPS()));
         telemetry.addData("Drivetrain speed", drivetrain.getSpeedMultiplier());
+
+        // panels graph feed
+        panelsGraph.addData("flywheelRPS", shooter.getFlywheelRPS());
+        panelsGraph.addData("flywheelTarget", Shooter.desiredFlywheelRPS);
+        panelsGraph.addData("flywheelError", shooter.getFlywheelErrorRPS());
+        panelsGraph.addData("feederPower", shooter.getFeederPower());
+        panelsGraph.addData("intakePower", intake.getPower());
+
+        panelsGraph.update();
+        panelsTelemetry.update(telemetry);
     }
 }
