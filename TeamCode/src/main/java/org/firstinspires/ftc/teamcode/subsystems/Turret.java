@@ -17,14 +17,14 @@ public class Turret {
 
     public static double desiredAngle;
 
-    public static double kD, kV;
+    public static double kD;
     public static double kS = 0.057;
     public static double kP = 0.15;
 
     private ElapsedTime timer = new ElapsedTime();
-    private double lastError = 0;
+    private double lastError;
 
-    public static double MAX_POWER = 0.4;
+    public static double MAX_POWER = 0.8;
     private double power = 0;
 
     public static double ANGLE_TOLERANCE = 0.2;
@@ -52,6 +52,9 @@ public class Turret {
         timer.reset();
     }
 
+    public void goTo(double angle) {
+        desiredAngle = angle;
+    }
     public void resetTurretEncoder() {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);}
 
@@ -60,16 +63,20 @@ public class Turret {
         double error = getErrorAngle();
 
         double sTerm = Math.copySign(kS, error);
-        double vTerm = error / deltaTime * kV;
 
         double pTerm = error * kP;
 
-        double dTerm = 0;
+        double currentAngle = getCurrentAngle();
+
+        double dTerm = 0; //double vTerm = 0;
         if (deltaTime > 0) {
-            dTerm = ((error - lastError) / deltaTime) * kD;
+            dTerm = (error - lastError) / deltaTime * kD;
+
+        //    double setpointVelocity = (desiredAngle - lastDesiredAngle) / deltaTime;
+        //    vTerm = setpointVelocity * kV;
         }
 
-        double combinedTerm = sTerm + vTerm + pTerm + dTerm;
+        double combinedTerm = sTerm + pTerm + dTerm;
 
         if (Math.abs(error) < ANGLE_TOLERANCE) {
             power = 0;
@@ -77,11 +84,12 @@ public class Turret {
             power = Range.clip(combinedTerm, -MAX_POWER, MAX_POWER);
         }
 
-        if (power > 0 && getCurrentAngle() >= MAX_ANGLE) {power = 0;}
-        else if (power < 0 && getCurrentAngle() <= MIN_ANGLE) {power = 0;}
+        if (power > 0 && currentAngle >= MAX_ANGLE) {power = 0;}
+        else if (power < 0 && currentAngle <= MIN_ANGLE) {power = 0;}
 
         turret.setPower(power);
-        lastError = error; timer.reset();
+        lastError = error;
+        timer.reset();
     }
 
 }

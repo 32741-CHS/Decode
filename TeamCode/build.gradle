@@ -32,4 +32,5 @@ android {
 dependencies {
     implementation project(':FtcRobotController')
     implementation 'com.bylazar:fullpanels:1.0.0'
+    implementation 'com.bylazar:camerastream:1.0.0'
 }
