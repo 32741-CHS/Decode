@@ -4,6 +4,8 @@ import android.util.Size;
 
 import com.bylazar.camerastream.PanelsCameraStream;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
@@ -12,6 +14,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 // 20 = blue goal, 24 = red goal
@@ -38,8 +41,20 @@ public class Vision {
                 .addProcessor(processor)
                 .build();
 
-        // TODO: tune exposure with ConceptAprilTagOptimizeExposure
-        processor.setDecimation(2);
+        processor.setDecimation(3);
+
+        while (portal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            // wait for camera to be ready
+        }
+
+        ExposureControl exp = portal.getCameraControl(ExposureControl.class);
+        if (exp != null) {
+            exp.setMode(ExposureControl.Mode.Manual);
+            exp.setExposure(5, TimeUnit.MILLISECONDS);
+        }
+
+        GainControl gain = portal.getCameraControl(GainControl.class);
+        if (gain != null) gain.setGain(80);
 
         PanelsCameraStream.INSTANCE.startStream(portal, MAX_FPS);
     }
