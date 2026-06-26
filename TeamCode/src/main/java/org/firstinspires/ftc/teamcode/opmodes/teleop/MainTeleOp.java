@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
-import static org.firstinspires.ftc.teamcode.utils.Apriltags.BLUE_GOAL;
-import static org.firstinspires.ftc.teamcode.utils.Apriltags.RED_GOAL;
+import static org.firstinspires.ftc.teamcode.utils.AprilTags.BLUE_GOAL;
+import static org.firstinspires.ftc.teamcode.utils.AprilTags.RED_GOAL;
 
 import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
@@ -61,19 +61,19 @@ public class MainTeleOp extends OpMode {
         turret = new Turret(hw);
 
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Alliance", "START+A = Red, START+B = Blue");
+        telemetry.addData("Alliance", "Square = Red, X = Blue");
         telemetry.update();
     }
 
     @Override
     public void init_loop() {
-        if (gamepad1.start && gamepad1.a) {
+        if (gamepad1.x) {
             isRed = true;
-        } else if (gamepad1.start && gamepad1.b) {
+        } else if (gamepad1.a) {
             isRed = false;
         }
-        telemetry.addData("Alliance", isRed ? "RED" : "BLUE");
-        telemetry.addData("Controls", "Hold START + A (Red) or B (Blue)");
+        telemetry.addData("Team", isRed ? "RED" : "BLUE");
+        telemetry.addData("Switch", "Square = Red, X = Blue");
         telemetry.update();
     }
 
@@ -108,7 +108,11 @@ public class MainTeleOp extends OpMode {
         if (gp2.lt >= TRIGGER_THRESHOLD) {intake.eat();}
         if (gp2.a.isHeld()) { intake.invert();}
 
-        if (gp2.rt >= TRIGGER_THRESHOLD) {shooter.feed();}
+        if (gamepad2.a && gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+            shooter.reverseFeed();
+        } else if (gamepad2.right_trigger >= TRIGGER_THRESHOLD) {
+            shooter.feed();
+        }
         if (gp2.x.wasPressed()) { shooter.toggleFlywheel();}
 
         // turret: right stick x for manual override, or auto-track the goal tag
@@ -144,11 +148,11 @@ public class MainTeleOp extends OpMode {
         panelsTelemetry.addData("Turret angle", turret.getCurrentAngle());
         panelsTelemetry.addData("Turret error", turret.getErrorAngle());
         panelsTelemetry.addData("Turret mode", turretManualMode ? "MANUAL" : "AUTO");
+        panelsTelemetry.addData("Field Centric", isFieldDriving);
 
         if (goalTag != null) {
             panelsTelemetry.addData("Tag distance", String.format("%.2f m", goalTag.ftcPose.range));
             panelsTelemetry.addData("Tag bearing", String.format("%.1f deg", Math.toDegrees(goalTag.ftcPose.bearing)));
-            panelsTelemetry.addData("Suggested RPS", Ballistics.getFlywheelRPS(goalTag.ftcPose.range));
         } else {
             panelsTelemetry.addData("Tag distance", "no tag");
         }
