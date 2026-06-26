@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static org.firstinspires.ftc.teamcode.configs.TickRates.GOBILDA_5203_312RPM;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -89,10 +90,10 @@ public class Drivetrain {
     }
 
     public void resetIMU() {
-        imu.initialize(new IMU.Parameters( // TODO update these
+        imu.initialize(new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                        RevHubOrientationOnRobot.UsbFacingDirection.DOWN
                 )
         ));
     }
@@ -107,7 +108,8 @@ public class Drivetrain {
         }
     }
 
-    public void driveDistance(double distance) {
+    // async + non blocking methods (iterative opmodes, state machines (need for pedro later))
+    public void setDriveTarget(double distance) {
         int target = (int)(distance * COUNTS_PER_CM);
 
         for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
@@ -116,15 +118,29 @@ public class Drivetrain {
             m.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             m.setPower(AUTO_DRIVE_SPEED);
         }
+    }
 
-        while (flDrive.isBusy()) {} // find a better way to do this maybe
+    public boolean isBusy() {
+        // Returns true if ANY motor is still driving to its target
+        return flDrive.isBusy() || frDrive.isBusy() || blDrive.isBusy() || brDrive.isBusy();
+    }
 
+    public void clearDriveTarget() {
         for (DcMotor m : new DcMotor[]{flDrive, frDrive, blDrive, brDrive}) {
             m.setPower(0);
             m.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
 
-
-
+    // synchronous / blocking method (best for linearopmodes)
+    public void driveDistanceBlocking(double distance, LinearOpMode opMode) {
+        setDriveTarget(distance);
+        
+        while (opMode.opModeIsActive() && isBusy()) {
+            // Yield to other processes while waiting
+            opMode.idle(); 
+        }
+        
+        clearDriveTarget();
+    }
 }
