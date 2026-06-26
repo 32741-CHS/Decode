@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 public class Turret {
 
     private final DcMotorEx turret;
-    // TODO: wheel diameter / lazy susan diameter
+    // TODO: measure wheel diameter / lazy susan diameter
     private final static double MOTOR_TO_TURRET_RATIO = 65.5 / 290;
 
     public static double desiredAngle;
