@@ -7,9 +7,6 @@ import com.bylazar.gamepad.GamepadManager;
 import com.bylazar.gamepad.PanelsGamepad;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
-import com.bylazar.graph.PanelsGraph;
-import com.bylazar.graph.GraphManager;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -35,7 +32,6 @@ public class MainTeleOp extends OpMode {
     private Vision vision;
 
     private final TelemetryManager panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
-    private final GraphManager panelsGraph = PanelsGraph.INSTANCE.getManager();
     private final GamepadEx gp1 = new GamepadEx();
     private final GamepadEx gp2 = new GamepadEx();
 
@@ -157,14 +153,6 @@ public class MainTeleOp extends OpMode {
             panelsTelemetry.addData("Tag distance", "no tag");
         }
 
-        // panels graph feed
-        panelsGraph.addData("flywheelRPS", shooter.getFlywheelRPS());
-        panelsGraph.addData("flywheelTarget", Shooter.desiredFlywheelRPS);
-        panelsGraph.addData("flywheelError", shooter.getFlywheelErrorRPS());
-        panelsGraph.addData("feederPower", shooter.getFeederPower());
-        panelsGraph.addData("intakePower", intake.getPower());
-
-        panelsGraph.update();
         panelsTelemetry.update(telemetry);
     }
 }
