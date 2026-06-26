@@ -7,8 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.configs.RobotHardware;
 
 @Configurable
@@ -19,19 +17,13 @@ public class Shooter {
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;
 
-    public static boolean forceFeed = false;
     public static double flywheelKP = 6.5;
-    // theoretical kf = 32767 / (6000/60 * 112) = 2.93
-    // tune this up slightly if flywheel runs below target
-    public static double flywheelKF = 2.93;
+    public static double flywheelKF = 6.5;
 
-    public static double FLYWHEEL_ERROR_TOLERANCE = 1;
     public static boolean canSpinFlywheel = false;
 
-    // feeder runs for a set duration instead of one frame
-    private ElapsedTime feedTimer = new ElapsedTime();
-    private boolean isFeeding = false;
-    public static double FEED_TIME_SECONDS = 0.4;
+    private boolean requestedFeed = false;
+    private boolean requestedReverseFeed = false;
 
     public Shooter(RobotHardware hw) {
         flywheel = hw.flywheel;
@@ -65,18 +57,16 @@ public class Shooter {
 
     public void toggleFlywheel() {
         canSpinFlywheel = !canSpinFlywheel;
+        if (canSpinFlywheel) desiredFlywheelRPS = 13;
     }
 
     public void feed() {
-        if (!isFeeding) {
-            isFeeding = true;
-            feedTimer.reset();
-        }
+        requestedFeed = true;
     }
 
-    // use the ballistics lookup table to set flywheel speed from distance
-    public void setTargetFromDistance(double distanceMeters) {
-        desiredFlywheelRPS = Ballistics.getFlywheelRPS(distanceMeters);
+    public void reverseFeed() {
+        requestedFeed = true;
+        requestedReverseFeed = true;
     }
 
     public void update() {
@@ -86,18 +76,12 @@ public class Shooter {
 
         flywheel.setVelocity(canSpinFlywheel ? desiredFlywheelRPS * GOBILDA_5203_6000RPM : 0);
 
-        // timed feeder
-        if (isFeeding && feedTimer.seconds() < FEED_TIME_SECONDS) {
-            boolean atSpeed = Math.abs(getFlywheelErrorRPS()) <= FLYWHEEL_ERROR_TOLERANCE;
-            if (atSpeed || forceFeed) {
-                feeder.setPower(desiredFeederPower);
-            } else {
-                feeder.setPower(0);
-            }
+        if (requestedFeed) {
+            feeder.setPower(requestedReverseFeed ? -desiredFeederPower : desiredFeederPower);
         } else {
             feeder.setPower(0);
-            isFeeding = false;
-            forceFeed = false;
         }
+        requestedFeed = false;
+        requestedReverseFeed = false;
     }
 }
