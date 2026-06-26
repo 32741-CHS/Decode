@@ -66,9 +66,6 @@ public class GamepadEx {
 
         // flips each time you press, returns current state
         public boolean wasToggled() {
-            if (wasPressed()) {
-                toggleState = !toggleState;
-            }
             return toggleState;
         }
 
@@ -85,6 +82,9 @@ public class GamepadEx {
         void update(boolean pressed) {
             prev = current;
             current = pressed;
+            if (wasPressed()) {
+                toggleState = !toggleState;
+            }
         }
     }
 }
