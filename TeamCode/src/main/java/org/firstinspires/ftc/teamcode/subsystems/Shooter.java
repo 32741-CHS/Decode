@@ -17,8 +17,8 @@ public class Shooter {
     public static double desiredFlywheelRPS = 13;
     public static double desiredFeederPower = 0.7;
 
-    public static double flywheelKP = 6.5;
-    public static double flywheelKF = 6.5;
+    public static double flywheelKP = 15;
+    public static double flywheelKF = 11.5;
 
     public static boolean canSpinFlywheel = false;
 
